@@ -367,7 +367,7 @@ def main():
     
     # Loop Master
     loop_p = sub.add_parser("loop-master", help="Create, manage, and monitor autonomous 24/7 loops")
-    loop_p.add_argument("--action", required=True, choices=["status", "list", "create", "get", "update", "delete", "start", "stop", "pause", "freeze", "resume", "run-now", "daemon"], help="Loop action")
+    loop_p.add_argument("--action", required=True, choices=["status", "list", "create", "get", "update", "delete", "start", "stop", "pause", "freeze", "resume", "run-now", "daemon", "execute"], help="Loop action")
     loop_p.add_argument("--loop-id", default="", help="Loop ID")
     loop_p.add_argument("--name", default="", help="Loop name")
     loop_p.add_argument("--description", default="", help="Loop description")

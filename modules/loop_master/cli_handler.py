@@ -10,6 +10,20 @@ from modules.loop_master import LoopMaster, LoopStatus, LoopPriority
 def cmd_loop_master(args):
     """Handle loop-master CLI commands."""
     master = LoopMaster()
+
+    if args.action == "execute":
+        # Fire one iteration immediately (for testing)
+        result = master.run_iteration(args.loop_id)
+        return {"status": "ok", "execution": result}
+
+    elif args.action == "daemon":
+        # Start/stop the 24/7 daemon
+        from modules.loop_master.daemon import get_daemon
+        daemon = get_daemon(master)
+        if not daemon.is_running:
+            daemon.start()
+            return {"status": "ok", "message": "Daemon started", "daemon": daemon.get_status()}
+        return {"status": "ok", "message": "Daemon already running", "daemon": daemon.get_status()}
     
     if args.action == "status":
         return {"status": "ok", "data": master.get_stats()}

@@ -242,11 +242,51 @@ class LoopMaster:
         loop = self.loops.get(loop_id)
         if not loop or loop.status != LoopStatus.RUNNING:
             return False
-        # In async context, we'd schedule this. For now, mark last_run.
         loop.last_run = datetime.now(timezone.utc).isoformat()
         loop.run_count += 1
         self._save()
         return True
+
+    def run_iteration(self, loop_id: str, executor=None) -> dict:
+        """
+        Execute one iteration of a loop using the provided executor.
+        Falls back to a simple marker if no executor is provided.
+        Returns the execution result as a dict.
+        """
+        loop = self.loops.get(loop_id)
+        if not loop:
+            return {"success": False, "error": "Loop not found"}
+
+        if executor is None:
+            from .executor import get_executor
+            executor = get_executor()
+
+        result = executor.execute(
+            loop_id=loop.id,
+            entry_point=loop.entry_point,
+            params=loop.params,
+            goal=loop.metadata.get("goal", ""),
+            criteria=loop.metadata.get("criteria", ""),
+            iteration=loop.run_count,
+        )
+
+        # Update loop state
+        loop.last_run = result.timestamp
+        loop.run_count += 1
+        if result.success:
+            loop.success_count += 1
+            loop.last_error = None
+            if loop.status == LoopStatus.ERROR:
+                loop.status = LoopStatus.RUNNING
+        else:
+            loop.error_count += 1
+            loop.last_error = result.error
+            loop.retry_count += 1
+            if loop.retry_count >= loop.max_retries:
+                loop.status = LoopStatus.ERROR
+        loop.updated_at = datetime.now(timezone.utc).isoformat()
+        self._save()
+        return result.to_dict()
 
     def get_stats(self) -> Dict[str, Any]:
         """Get aggregate statistics across all loops."""

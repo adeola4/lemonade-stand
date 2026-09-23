@@ -25,6 +25,8 @@ from .metrics import MetricsEngine, get_metrics_engine, LoopExecutionRecord
 from .template_library import TemplateLibrary, get_template_library, LoopTemplate
 from .scheduler import SchedulingEngine, get_scheduling_engine, ScheduleRule, CronParser, TimeWindow
 from .resource_monitor import ResourceMonitor, get_resource_monitor, ThrottleLevel
+from .executor import LoopExecutor, ExecutionResult, get_executor
+from .daemon import LoopDaemon, get_daemon
 
 __all__ = [
     # Core
@@ -45,4 +47,8 @@ __all__ = [
     "SchedulingEngine", "get_scheduling_engine", "ScheduleRule", "CronParser", "TimeWindow",
     # Resource Monitor
     "ResourceMonitor", "get_resource_monitor", "ThrottleLevel",
+    # Executor
+    "LoopExecutor", "ExecutionResult", "get_executor",
+    # Daemon
+    "LoopDaemon", "get_daemon",
 ]
