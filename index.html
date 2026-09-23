@@ -128,10 +128,19 @@
           <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Pipeline</h2>
         </div>
         <div class="text-sm space-y-2">
-          <div class="flex justify-between"><span style="color: #9ca3af">Sourced:</span><span>0</span></div>
-          <div class="flex justify-between"><span style="color: #9ca3af">Approaching:</span><span>0</span></div>
-          <div class="flex justify-between"><span style="color: #9ca3af">Closing:</span><span>0</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Sourced:</span><span id="pipeSourced">0</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Approaching:</span><span id="pipeApproaching">0</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Closing:</span><span id="pipeClosing">0</span></div>
         </div>
+      </div>
+    </div>
+
+    <div class="panel p-5 mb-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Active Missions</h2>
+      </div>
+      <div class="space-y-2" id="dashboardMissions">
+        <div class="text-lms-muted text-xs font-medium">NO ACTIVE MISSIONS</div>
       </div>
     </div>
 
@@ -154,5 +163,6 @@
       else { window.location.href = '/'; }
     }
   </script>
+  <script src="/assets/dashboard.js"></script>
 </body>
 </html>

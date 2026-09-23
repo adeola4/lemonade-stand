@@ -29,6 +29,8 @@
     .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
     .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
     .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn-red { background: transparent; color: #f87171; border-color: #f87171; }
+    .btn-red:hover { background: rgba(248, 113, 113, 0.12); color: #fca5a5; }
     .pill { padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
     .pill-active { background: #065f46; color: #4ade80; }
     .edit-count { font-size: 10px; color: #4b5563; font-family: 'Courier New', monospace; }
@@ -420,19 +422,52 @@
 
     function rankBadge(rank) { return `<span class="rank-badge rank-${rank || 'B'}">${rank || 'B'}</span>`; }
 
+    function progressClass(m) {
+      if (m.status !== 'active') return '';
+      if (m.acceptance === 'declined') return 'mission-declined';
+      if (!m.acceptance) return 'mission-pending-acceptance';
+      if (m.progress === 'in-progress') return 'mission-in-progress';
+      if (m.progress === 'complete') return 'mission-complete';
+      return 'mission-not-started';
+    }
+
+    function elapsedSince(iso) {
+      const ms = Date.now() - new Date(iso).getTime();
+      const s = Math.floor(ms / 1000);
+      const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+      if (d > 0) return `${d}d ${h}h ${m}m`;
+      if (h > 0) return `${h}h ${m}m ${sec}s`;
+      if (m > 0) return `${m}m ${sec}s`;
+      return `${sec}s`;
+    }
+
     function missionCard(m, showArchive) {
       const buttons = [];
       if (m.status === 'active') {
-        buttons.push(`<button class="btn btn-ghost" onclick="editMission('${m.id}')">✎ Edit</button>`);
-        buttons.push(`<button class="btn btn-ghost" onclick="openNotes('${m.id}')">💬 Notes${(m.notes||[]).length ? ' (' + m.notes.length + ')' : ''}</button>`);
-        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'completed')">✓ Done</button>`);
-        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'blocked')">⚠ Block</button>`);
-        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+        if (!m.acceptance) {
+          // Pending acceptance: assigner-level accept/decline
+          buttons.push(`<button class="btn btn-green" onclick="acceptMission('${m.id}')">✓ Accept</button>`);
+          buttons.push(`<button class="btn btn-red" onclick="declineMission('${m.id}')">✕ Decline</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="editMission('${m.id}')">✎ Edit</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="openNotes('${m.id}')">💬 Notes${(m.notes||[]).length ? ' (' + m.notes.length + ')' : ''}</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+        } else if (m.acceptance === 'declined') {
+          buttons.push(`<button class="btn btn-ghost" onclick="acceptMission('${m.id}')">↩ Reassign & Accept</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="editMission('${m.id}')">✎ Edit</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+        } else {
+          // Accepted: progress controls + actions
+          buttons.push(`<button class="btn btn-ghost" onclick="editMission('${m.id}')">✎ Edit</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="openNotes('${m.id}')">💬 Notes${(m.notes||[]).length ? ' (' + m.notes.length + ')' : ''}</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'completed')">✓ Complete</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'blocked')">⚠ Block</button>`);
+          buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+        }
       } else if (m.status === 'blocked') {
         buttons.push(`<button class="btn btn-ghost" onclick="editMission('${m.id}')">✎ Edit</button>`);
         buttons.push(`<button class="btn btn-ghost" onclick="openNotes('${m.id}')">💬 Notes${(m.notes||[]).length ? ' (' + m.notes.length + ')' : ''}</button>`);
         buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'active')">▶ Resume</button>`);
-        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'completed')">✓ Done</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'completed')">✓ Complete</button>`);
         buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
       } else if (m.status === 'completed') {
         buttons.push(`<button class="btn btn-ghost" onclick="editMission('${m.id}')">✎ Edit</button>`);
@@ -448,23 +483,57 @@
       const editCount = m.edits ? ` <span class="edit-count">✎${m.edits}</span>` : '';
       const pendingNotes = (m.notes || []).filter(n => !n.acknowledged).length;
       const noteAlert = pendingNotes > 0 ? `<span class="note-alert" onclick="openNotes('${m.id}')" title="${pendingNotes} pending note(s) for ${m.assigned_to || 'assigner'}">🔔 ${pendingNotes}</span>` : '';
+
+      // Timer: pending acceptance → time since posted; accepted → time since acceptance
+      let timerBlock = '';
+      if (m.status === 'active' && !m.acceptance) {
+        timerBlock = `<div class="accept-timer" data-timer="pending-${m.id}">⏱ Awaiting acceptance: ${elapsedSince(m.created_at)}</div>`;
+      } else if (m.status === 'active' && m.acceptance === 'accepted' && m.accepted_at) {
+        timerBlock = `<div class="accept-timer" style="color:#4ade80" data-timer="accepted-${m.id}">⏱ Accepted ${elapsedSince(m.accepted_at)} ago</div>`;
+      }
+
+      // Progress selector (only when accepted & active)
+      let progressBlock = '';
+      if (m.status === 'active' && m.acceptance === 'accepted') {
+        const p = m.progress || 'not-started';
+        progressBlock = `
+          <div class="flex flex-wrap gap-2 mt-2" id="progress-${m.id}">
+            <button class="progress-btn ${p==='not-started'?'active-not-started':''}" onclick="setProgress('${m.id}','not-started')">Not Started</button>
+            <button class="progress-btn ${p==='in-progress'?'active-in-progress':''}" onclick="setProgress('${m.id}','in-progress')">In Progress</button>
+            <button class="progress-btn ${p==='complete'?'active-complete':''}" onclick="setProgress('${m.id}','complete')">Complete</button>
+          </div>
+        `;
+      }
+
+      // Status pill label
+      let statusLabel = m.status;
+      if (m.status === 'active') {
+        if (!m.acceptance) statusLabel = 'pending';
+        else if (m.acceptance === 'declined') statusLabel = 'declined';
+        else statusLabel = m.progress || 'not-started';
+      }
+
       return `
-        <div class="p-3 rounded-lg border border-lms-border" style="background: rgba(0,0,0,0.2)">
-          <div class="flex items-center justify-between mb-1">
-            <div class="flex items-center gap-2">
-              ${rankBadge(m.rank)}
+        <div class="p-3 rounded-lg border border-lms-border mission-progress-base ${progressClass(m)}" style="background: rgba(0,0,0,0.2)">
+          <div class="flex items-start justify-between mb-1 gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
               <span class="font-semibold text-sm">${m.title}</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-shrink-0">
               ${noteAlert}
-              <span class="pill pill-${m.status}">${m.status}</span>
+              <span class="pill pill-${m.status}">${statusLabel}</span>
             </div>
+          </div>
+          <div class="mb-1">
+            <span class="rank-badge-lg rank-lg-${m.rank || 'B'}">${m.rank || 'B'}</span>
           </div>
           <p class="text-xs" style="color: #9ca3af">${m.description || 'No description'}</p>
           <div class="flex flex-wrap gap-2 mt-2 text-xs font-mono" style="color: #60a5fa">
-            ${m.company ? `<span>🏢 ${m.company}</span>` : ''}
-            ${m.assigned_to ? `<span>👤 ${m.assigned_to}</span>` : ''}
+            ${m.company ? `<span>🏢 ${m.company}</span>` : '' }
+            ${m.assigned_to ? `<span>👤 ${m.assigned_to}</span>` : '' }
           </div>
+          ${timerBlock}
+          ${progressBlock}
           <div class="flex flex-wrap gap-2 mt-2">
             ${buttons.join('')}
           </div>${editCount}
@@ -581,6 +650,51 @@
       closeEditModal();
       renderMissions();
     }
+
+    // ===== Acceptance workflow =====
+    function acceptMission(id) {
+      const m = missions.find(x => x.id === id);
+      if (!m) return;
+      m.acceptance = 'accepted';
+      m.accepted_at = new Date().toISOString();
+      m.progress = 'not-started';
+      m.updated_at = new Date().toISOString();
+      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      renderMissions();
+    }
+
+    function declineMission(id) {
+      const m = missions.find(x => x.id === id);
+      if (!m) return;
+      m.acceptance = 'declined';
+      m.declined_at = new Date().toISOString();
+      m.updated_at = new Date().toISOString();
+      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      renderMissions();
+    }
+
+    function setProgress(id, progress) {
+      const m = missions.find(x => x.id === id);
+      if (!m) return;
+      m.progress = progress;
+      m.updated_at = new Date().toISOString();
+      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      renderMissions();
+    }
+
+    // Live timer refresh (every second, updates only timer elements — no full re-render)
+    setInterval(() => {
+      document.querySelectorAll('[data-timer]').forEach(el => {
+        const key = el.getAttribute('data-timer');
+        const m = missions.find(x => key.endsWith(x.id));
+        if (!m) return;
+        if (key.startsWith('pending-')) {
+          el.textContent = `⏱ Awaiting acceptance: ${elapsedSince(m.created_at)}`;
+        } else if (key.startsWith('accepted-') && m.accepted_at) {
+          el.textContent = `⏱ Accepted ${elapsedSince(m.accepted_at)} ago`;
+        }
+      });
+    }, 1000);
 
     // ===== Notes / Updates =====
     function openNotes(id) {
