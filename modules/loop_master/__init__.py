@@ -27,6 +27,8 @@ from .scheduler import SchedulingEngine, get_scheduling_engine, ScheduleRule, Cr
 from .resource_monitor import ResourceMonitor, get_resource_monitor, ThrottleLevel
 from .executor import LoopExecutor, ExecutionResult, get_executor
 from .daemon import LoopDaemon, get_daemon
+from .document_parser import DocumentParser, ParsedLoopConfig, parse_document
+from .recursive_engine import RecursiveImprovementEngine, ImprovementResult, review_loop, apply_improvements
 
 __all__ = [
     # Core
@@ -51,4 +53,8 @@ __all__ = [
     "LoopExecutor", "ExecutionResult", "get_executor",
     # Daemon
     "LoopDaemon", "get_daemon",
+    # Document Parser
+    "DocumentParser", "ParsedLoopConfig", "parse_document",
+    # Recursive Engine
+    "RecursiveImprovementEngine", "ImprovementResult", "review_loop", "apply_improvements",
 ]

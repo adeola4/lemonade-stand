@@ -383,6 +383,27 @@ def main():
     loopgen_p.add_argument("--prompt", required=True, help="Natural language prompt")
     loopgen_p.add_argument("--company", default="tan", help="Company name")
     loopgen_p.add_argument("--auto-start", action="store_true", help="Auto-start the loop after creation")
+
+    # Document Parser — parse a document into a loop config
+    loopparse_p = sub.add_parser("loop-parse", help="Parse a document into a loop configuration")
+    loopparse_p.add_argument("--document", required=True, help="Document describing the loop")
+    loopparse_p.add_argument("--company", default="tan", help="Company name")
+
+    # Create loop from document
+    loopcreatedoc_p = sub.add_parser("loop-create-from-doc", help="Parse a document and create a loop")
+    loopcreatedoc_p.add_argument("--document", required=True, help="Document describing the loop")
+    loopcreatedoc_p.add_argument("--company", default="tan", help="Company name")
+    loopcreatedoc_p.add_argument("--auto-start", action="store_true", help="Auto-start the loop after creation")
+
+    # Recursive improvement — review and suggest improvements
+    loopreview_p = sub.add_parser("loop-review", help="Review loop execution history and suggest improvements")
+    loopreview_p.add_argument("--loop-id", required=True, help="Loop ID to review")
+    loopreview_p.add_argument("--history-count", type=int, default=10, help="Number of recent executions to review")
+
+    # Apply improvements to a loop
+    loopapply_p = sub.add_parser("loop-apply", help="Apply improvements to a loop")
+    loopapply_p.add_argument("--loop-id", required=True, help="Loop ID to update")
+    loopapply_p.add_argument("--improvements", required=True, help="JSON array of improvements to apply")
     
     # Loop engineering modules
     adaptive_p = sub.add_parser("loop-adaptive", help="Adaptive interval engine — auto-adjusts loop timing")
@@ -585,6 +606,14 @@ def main():
         result = cmd_loop_master(args)
     elif args.command == "loop-gen":
         result = cmd_loop_gen(args)
+    elif args.command == "loop-parse":
+        result = cmd_loop_parse(args)
+    elif args.command == "loop-create-from-doc":
+        result = cmd_loop_create_from_doc(args)
+    elif args.command == "loop-review":
+        result = cmd_loop_review(args)
+    elif args.command == "loop-apply":
+        result = cmd_loop_apply(args)
     elif args.command == "loop-adaptive":
         result = cmd_loop_adaptive(args)
     elif args.command == "loop-deps":
