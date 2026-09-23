@@ -8,9 +8,11 @@
     { "src": "links.html", "use": "@vercel/static" },
     { "src": "brain.html", "use": "@vercel/static" },
     { "src": "docs.html", "use": "@vercel/static" },
-    { "src": "content-advisor.html", "use": "@vercel/static" }
+    { "src": "content-advisor.html", "use": "@vercel/static" },
+    { "src": "assets/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/deals.html", "dest": "/deals.html" },
     { "src": "/qla.html", "dest": "/qla.html" },
     { "src": "/loop-master.html", "dest": "/loop-master.html" },
