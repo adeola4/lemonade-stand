@@ -227,7 +227,7 @@ class RecursiveImprovementEngine:
             elif imp_type == "entry_point_refinement":
                 updated["entry_point"] = imp.get("new", updated.get("entry_point", ""))
 
-            elif imp_type == "workflow_step_add":
+            elif imp_type in ("workflow_step_add", "workflow_step_addition"):
                 step = imp.get("step")
                 if step and "workflow" in updated and "steps" in updated["workflow"]:
                     updated["workflow"]["steps"].append(step)

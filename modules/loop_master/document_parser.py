@@ -244,7 +244,7 @@ class DocumentParser:
         )
 
     def _extract_json(self, text: str) -> Optional[Dict[str, Any]]:
-        """Extract JSON from LLM response (handles markdown code blocks)."""
+        """Extract JSON from LLM response (handles markdown code blocks and surrounding text)."""
         # Try to find JSON in code blocks first
         code_block_pattern = r'```(?:json)?\s*\n?(.*?)\n?```'
         matches = re.findall(code_block_pattern, text, re.DOTALL)
@@ -254,14 +254,14 @@ class DocumentParser:
             except json.JSONDecodeError:
                 continue
 
-        # Try to find raw JSON
-        json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
-        matches = re.findall(json_pattern, text, re.DOTALL)
-        for match in matches:
+        # Try to find the first { and last } — handles text before/after JSON
+        first_brace = text.find('{')
+        last_brace = text.rfind('}')
+        if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
             try:
-                return json.loads(match.strip())
+                return json.loads(text[first_brace:last_brace + 1])
             except json.JSONDecodeError:
-                continue
+                pass
 
         # Try the whole response
         try:
