@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
           id: 'm-' + Date.now().toString(36),
           title: qm.value.trim(),
           description: '',
-          priority: 'standard',
+          rank: 'B',
+          progress: null,
+          acceptance: null,
           status: 'active',
           company: '',
           pct_complete: 0,
@@ -118,19 +120,21 @@ function renderDashboardMissions() {
     return;
   }
   el.innerHTML = active.map(m => {
-    const pColor = { critical: 'text-lms-red', standard: 'text-lms-amber', routine: 'text-lms-green' }[m.priority] || 'text-lms-muted';
-    const pLabel = m.priority === 'critical' ? '!' : m.priority === 'routine' ? '•' : '>';
+    // Support both field sets: new missions use rank (S/A/B/C/D), old data used priority
+    const priority = m.priority || { S: 'critical', A: 'critical', B: 'standard', C: 'routine', D: 'routine' }[m.rank] || 'standard';
+    const pColor = { critical: 'text-lms-red', standard: 'text-lms-amber', routine: 'text-lms-green' }[priority] || 'text-lms-muted';
+    const pLabel = priority === 'critical' ? '!' : priority === 'routine' ? '•' : '>';
     const editCount = m.edits ? `<span class="font-mono" style="color:#4b5563;font-size:10px">✎${m.edits}</span>` : '';
     const noteAlert = (m.notes || []).filter(n => !n.acknowledged).length > 0
       ? `<span style="color:#fbbf24;font-size:10px">🔔</span>` : '';
     const progressDot = m.progress === 'in-progress' ? '🟡' : m.progress === 'complete' ? '🟢' : m.acceptance === 'declined' ? '🔴' : m.acceptance === 'accepted' ? '⚪' : '🔵';
-    return `<div class="mission-item priority-${m.priority} px-2 py-1.5 rounded flex items-center justify-between gap-2">
+    return `<div class="mission-item priority-${priority} px-2 py-1.5 rounded flex items-center justify-between gap-2">
       <span class="${pColor} font-mono font-bold text-sm font-medium w-3">${pLabel}</span>
       <span class="text-xs font-medium truncate flex-1">${m.title}</span>
       ${noteAlert}
       ${editCount}
       <span class="text-xs">${progressDot}</span>
-      <span class="text-xs font-medium ${pColor} font-mono">${m.priority.charAt(0).toUpperCase()}</span>
+      <span class="text-xs font-medium ${pColor} font-mono">${priority.charAt(0).toUpperCase()}</span>
     </div>`;
   }).join('');
 }
