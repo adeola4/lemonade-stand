@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // MISSION CONTROL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' }
+          },
+          fontFamily: { mono: ['Courier New', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all 0.2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .pill { padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+    .pill-active { background: #065f46; color: #4ade80; }
+    .pill-blocked { background: #78350f; color: #fbbf24; }
+    .pill-completed { background: #064e3b; color: #6ee7b7; }
+    .pill-archived { background: #1f2937; color: #6b7280; border: 1px solid #374151; }
+    .rank-badge { padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; font-family: 'Courier New', monospace; display: inline-block; }
+    .rank-S { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+    .rank-A { background: #78350f; color: #fcd34d; border: 1px solid #f59e0b; }
+    .rank-B { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
+    .rank-C { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
+    .rank-D { background: #374151; color: #9ca3af; border: 1px solid #6b7280; }
+    input, select, textarea { background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 100%; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24; }
+    label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; display: block; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background: #111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-lg font-bold font-mono tracking-wider" style="color: #fbbf24">LMS</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item">QLA Bot</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item active">Missions</a>
+          <a href="/links.html" class="nav-item">Links</a>
+          <a href="/brain.html" class="nav-item">Brain</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color: #9ca3af">v1.2</span>
+        <span class="text-xs font-mono px-2 py-1 rounded" style="background: #065f46; color: #4ade80">● LIVE</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+
+      <!-- Quick Add -->
+      <div class="panel p-5 mb-6">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Quick Add Mission</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label for="missionTitle">Mission Name</label>
+            <input type="text" id="missionTitle" placeholder="e.g. Close 3 LOIs by EOM">
+          </div>
+          <div>
+            <label for="missionRank">Mission Rank</label>
+            <select id="missionRank">
+              <option value="S">S — Critical / Company-Moving</option>
+              <option value="A" selected>A — High Priority</option>
+              <option value="B">B — Standard</option>
+              <option value="C">C — Low Priority</option>
+              <option value="D">D — Backlog / Whenever</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label for="missionDesc">Mission Description</label>
+            <textarea id="missionDesc" rows="2" placeholder="What does success look like?"></textarea>
+          </div>
+          <div>
+            <label for="missionCompany">Company</label>
+            <select id="missionCompany">
+              <option value="">— Select Company —</option>
+            </select>
+          </div>
+          <div>
+            <label for="missionAssigneeSelect">Assigned To (pick staff)</label>
+            <select id="missionAssigneeSelect" onchange="onAssigneePick()">
+              <option value="">— Select Staff —</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label for="missionAssigneeManual">Assigned To (manual entry)</label>
+            <input type="text" id="missionAssigneeManual" placeholder="Type a name — auto-added to staff list" onblur="onManualAssignee()">
+          </div>
+          <div class="md:col-span-2">
+            <button class="btn btn-amber w-full" onclick="addMission()">+ Add Mission</button>
+          </div>
+        </div>
+      </div>
+
+    <!-- Stats Bar -->
+    <div class="grid grid-cols-4 gap-3 mb-6">
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #4ade80;" id="statActive">0</div>
+        <div class="text-xs" style="color: #9ca3af">Active</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #fbbf24;" id="statBlocked">0</div>
+        <div class="text-xs" style="color: #9ca3af">Blocked</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #6ee7b7;" id="statCompleted">0</div>
+        <div class="text-xs" style="color: #9ca3af">Completed</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #6b7280;" id="statArchived">0</div>
+        <div class="text-xs" style="color: #9ca3af">Archived</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Active + Completed + Archived -->
+      <div class="md:col-span-2 space-y-6">
+
+        <!-- Active Missions -->
+        <div class="panel p-5">
+          <div class="panel-header">
+            <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Active Missions</h2>
+          </div>
+          <div class="space-y-3" id="missionListActive">
+            <div class="text-sm text-center py-8" style="color: #6b7280">No active missions</div>
+          </div>
+        </div>
+
+        <!-- Completed Missions -->
+        <div class="panel p-5">
+          <div class="panel-header flex items-center justify-between cursor-pointer" onclick="toggleSection('completed')">
+            <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #6ee7b7">✓ Completed Missions</h2>
+            <div class="flex items-center gap-2">
+              <select id="filterCompletedCompany" onchange="renderMissions()" style="background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 11px; width: auto;">
+                <option value="">All Companies</option>
+              </select>
+              <span class="text-xs" id="toggleCompleted" style="color: #9ca3af">▼</span>
+            </div>
+          </div>
+          <div id="sectionCompleted">
+            <div class="space-y-3" id="missionListCompleted">
+              <div class="text-sm text-center py-8" style="color: #6b7280">No completed missions</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Archived Missions -->
+        <div class="panel p-5">
+          <div class="panel-header flex items-center justify-between cursor-pointer" onclick="toggleSection('archived')">
+            <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #6b7280">📦 Archived Missions</h2>
+            <div class="flex items-center gap-2">
+              <select id="filterArchivedCompany" onchange="renderMissions()" style="background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 11px; width: auto;">
+                <option value="">All Companies</option>
+              </select>
+              <span class="text-xs" id="toggleArchived" style="color: #9ca3af">▼</span>
+            </div>
+          </div>
+          <div id="sectionArchived">
+            <div class="space-y-3" id="missionListArchived">
+              <div class="text-sm text-center py-8" style="color: #6b7280">No archived missions</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function goBack() {
+      if (window.history.length > 1) { window.history.back(); }
+      else { window.location.href = '/'; }
+    }
+
+    // ===== Data: TAN business topology (from ~/tan-topology/app/data/topology.ts) =====
+    // 11 divisions, each with flagship + subsidiaries
+    const TOPOLOGY = [
+      { division: 'Healthcare', flagship: 'At Ease Healthcare', companies: ['At Ease Healthcare', 'AEH Staffing', 'AEH RCM', 'Veterinary Rollup Platform (Tier 1-3)', 'Functional Health Lab', 'Telehealth'] },
+      { division: 'Energy', flagship: 'Caribbean Oil & Gas', companies: ['Caribbean Oil & Gas', 'Renewable Energy'] },
+      { division: 'Coastal Flip Marine', flagship: 'Coastal Flip Marine', companies: ['Marina Acquisitions', 'Boat Salvage/Flips', 'Yacht Maintenance', 'Lionfish/Invasive Removal', 'Oyster Arbitrage'] },
+      { division: 'Digital Permanence', flagship: 'Digital Permanence', companies: ['Salesforce-Headless AI Agents', 'Performance Marketing', 'At Ease Cosmetics', 'GYM Kitchen / Juice Bar JV', 'Subcontract Delivery'] },
+      { division: 'Real Estate', flagship: 'LANDNOW', companies: ['LANDNOW', 'Quantum Portfolio Group', 'Water Rights Niche Group'] },
+      { division: 'Global Capital (Dubai)', flagship: 'Heritage Fauna & Legacy Assets', companies: ['Family Office Capital', 'Trade Finance', 'Events Hub', 'Heritage Fauna & Legacy Assets'] },
+      { division: 'Food, Beverage & Agriculture', flagship: 'FruitScription', companies: ['FruitScription', 'Quantum Farmer', 'SPECTRE PEPPER', 'ISOPOD SQUAD', 'TAX FREE HONEY BEE', 'COIR SUPPLY', 'Phytoremediation', 'Voltage Bar (Gym JV)'] },
+      { division: 'Events', flagship: 'Foreign Affairs Luxury Events', companies: ['Foreign Affairs Luxury Events', 'Marketpeace'] },
+      { division: 'Quinta Lumina', flagship: 'Quinta Lumina', companies: ['Molecular Extraction Lab', 'Mushroom Canopy', 'Plant Tissue Culture Lab', 'Crypto-Forest', 'Marine Bio-Tech', 'BSF Farming', 'Plant Biofoundry', 'LabLogic Functional Health Clinic'] },
+      { division: 'Virtual Content House', flagship: 'Virtual Content House', companies: ['Creator Pods', 'Algorithm Hacking Squad', 'Internal Brand Deals'] },
+      { division: 'Trades', flagship: 'TradesCo', companies: ['HVAC', 'Plumbing', 'Electrical', 'Waste Management'] }
+    ];
+    // Flat list: every division + subsidiary, deduplicated
+    const COMPANIES = (() => {
+      const out = [];
+      const seen = new Set();
+      for (const d of TOPOLOGY) {
+        if (!seen.has(d.division)) { out.push(d.division); seen.add(d.division); }
+        for (const c of d.companies) {
+          if (!seen.has(c)) { out.push(c); seen.add(c); }
+        }
+      }
+      return out;
+    })();
+
+    // ===== Data: staff roster =====
+    const AGENT_STAFF = [
+      'chief_of_staff',
+      'deal_lead',
+      'operations_lead',
+      'research_lead',
+      'finance_lead',
+      'Lakshit'
+    ];
+    let customStaff = JSON.parse(localStorage.getItem('qla_staff') || '[]');
+    function allStaff() {
+      // Merge agent staff + custom staff, deduplicate
+      const merged = [...AGENT_STAFF, ...customStaff];
+      return [...new Set(merged)];
+    }
+
+    function populateCompanySelect() {
+      const sel = document.getElementById('missionCompany');
+      // Grouped by division: optgroup per division, subsidiaries nested
+      for (const d of TOPOLOGY) {
+        const og = document.createElement('optgroup');
+        og.label = d.division + ' — ' + d.flagship;
+        for (const c of d.companies) {
+          const opt = document.createElement('option');
+          opt.value = c; opt.textContent = c;
+          og.appendChild(opt);
+        }
+        sel.appendChild(og);
+      }
+    }
+
+    function populateStaffSelect() {
+      const sel = document.getElementById('missionAssigneeSelect');
+      sel.innerHTML = '<option value="">— Select Staff —</option>';
+      allStaff().forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sel.appendChild(opt);
+      });
+    }
+
+    function populateFilterDropdowns() {
+      ['filterCompletedCompany', 'filterArchivedCompany'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        sel.innerHTML = '<option value="">All Companies</option>';
+        COMPANIES.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c; opt.textContent = c;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    function onAssigneePick() {
+      const picked = document.getElementById('missionAssigneeSelect').value;
+      if (picked) { document.getElementById('missionAssigneeManual').value = picked; }
+    }
+
+    function onManualAssignee() {
+      const name = document.getElementById('missionAssigneeManual').value.trim();
+      if (!name) return;
+      if (!allStaff().includes(name)) {
+        customStaff.push(name);
+        localStorage.setItem('qla_staff', JSON.stringify(customStaff));
+        populateStaffSelect();
+      }
+    }
+
+    // ===== Collapsible sections =====
+    function toggleSection(name) {
+      const sec = document.getElementById('section' + name.charAt(0).toUpperCase() + name.slice(1));
+      const arrow = document.getElementById('toggle' + name.charAt(0).toUpperCase() + name.slice(1));
+      if (sec.style.display === 'none') {
+        sec.style.display = 'block';
+        arrow.textContent = '▼';
+      } else {
+        sec.style.display = 'none';
+        arrow.textContent = '▶';
+      }
+    }
+
+    // ===== Missions =====
+    let missions = JSON.parse(localStorage.getItem('qla_missions') || '[]');
+
+    function rankBadge(rank) { return `<span class="rank-badge rank-${rank || 'B'}">${rank || 'B'}</span>`; }
+
+    function missionCard(m, showArchive) {
+      const buttons = [];
+      if (m.status === 'active') {
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'completed')">✓ Done</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'blocked')">⚠ Block</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+      } else if (m.status === 'blocked') {
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'active')">▶ Resume</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'completed')">✓ Done</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+      } else if (m.status === 'completed') {
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'active')">↩ Reopen</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'archived')">📦 Archive</button>`);
+      } else if (m.status === 'archived') {
+        buttons.push(`<button class="btn btn-ghost" onclick="updateStatus('${m.id}', 'active')">↩ Restore</button>`);
+        buttons.push(`<button class="btn btn-ghost" onclick="deleteMission('${m.id}')">🗑 Delete</button>`);
+      }
+      return `
+        <div class="p-3 rounded-lg border border-lms-border" style="background: rgba(0,0,0,0.2)">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              ${rankBadge(m.rank)}
+              <span class="font-semibold text-sm">${m.title}</span>
+            </div>
+            <span class="pill pill-${m.status}">${m.status}</span>
+          </div>
+          <p class="text-xs" style="color: #9ca3af">${m.description || 'No description'}</p>
+          <div class="flex flex-wrap gap-2 mt-2 text-xs font-mono" style="color: #60a5fa">
+            ${m.company ? `<span>🏢 ${m.company}</span>` : ''}
+            ${m.assigned_to ? `<span>👤 ${m.assigned_to}</span>` : ''}
+          </div>
+          <div class="flex gap-2 mt-2">
+            ${buttons.join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMissions() {
+      const active = missions.filter(m => m.status === 'active');
+      const blocked = missions.filter(m => m.status === 'blocked');
+      const completed = missions.filter(m => m.status === 'completed');
+      const archived = missions.filter(m => m.status === 'archived');
+
+      // Update stats
+      document.getElementById('statActive').textContent = active.length;
+      document.getElementById('statBlocked').textContent = blocked.length;
+      document.getElementById('statCompleted').textContent = completed.length;
+      document.getElementById('statArchived').textContent = archived.length;
+
+      // Active list
+      document.getElementById('missionListActive').innerHTML = active.length === 0
+        ? '<div class="text-sm text-center py-8" style="color: #6b7280">No active missions</div>'
+        : active.map(m => missionCard(m, true)).join('');
+
+      // Blocked appended to active
+      const activeList = document.getElementById('missionListActive');
+      if (blocked.length > 0) {
+        if (active.length === 0) activeList.innerHTML = '';
+        activeList.innerHTML += '<div class="text-xs font-bold uppercase mt-4 mb-2" style="color: #fbbf24">⚠ Blocked</div>' + blocked.map(m => missionCard(m, true)).join('');
+      }
+
+      // Completed list (filtered)
+      const compFilter = document.getElementById('filterCompletedCompany').value;
+      const compFiltered = compFilter ? completed.filter(m => m.company === compFilter) : completed;
+      document.getElementById('missionListCompleted').innerHTML = compFiltered.length === 0
+        ? '<div class="text-sm text-center py-8" style="color: #6b7280">No completed missions</div>'
+        : compFiltered.map(m => missionCard(m, false)).join('');
+
+      // Archived list (filtered)
+      const archFilter = document.getElementById('filterArchivedCompany').value;
+      const archFiltered = archFilter ? archived.filter(m => m.company === archFilter) : archived;
+      document.getElementById('missionListArchived').innerHTML = archFiltered.length === 0
+        ? '<div class="text-sm text-center py-8" style="color: #6b7280">No archived missions</div>'
+        : archFiltered.map(m => missionCard(m, false)).join('');
+    }
+
+    function addMission() {
+      const title = document.getElementById('missionTitle').value.trim();
+      if (!title) { alert('Please enter mission name'); return; }
+      const mission = {
+        id: 'm-' + Date.now().toString(36),
+        title,
+        rank: document.getElementById('missionRank').value,
+        description: document.getElementById('missionDesc').value.trim(),
+        company: document.getElementById('missionCompany').value,
+        assigned_to: document.getElementById('missionAssigneeManual').value.trim(),
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        source: 'web'
+      };
+      missions.push(mission);
+      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      document.getElementById('missionTitle').value = '';
+      document.getElementById('missionDesc').value = '';
+      document.getElementById('missionAssigneeManual').value = '';
+      renderMissions();
+    }
+
+    function updateStatus(id, status) {
+      const m = missions.find(x => x.id === id);
+      if (m) { m.status = status; m.updated_at = new Date().toISOString(); }
+      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      renderMissions();
+    }
+
+    function deleteMission(id) {
+      missions = missions.filter(x => x.id !== id);
+      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      renderMissions();
+    }
+
+    // Init
+    populateCompanySelect();
+    populateStaffSelect();
+    populateFilterDropdowns();
+    renderMissions();
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // LINKS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' }
+          },
+          fontFamily: { mono: ['Courier New', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all 0.2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    input, select, textarea { background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 100%; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background: #111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-lg font-bold font-mono tracking-wider" style="color: #fbbf24">LMS</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item">QLA Bot</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item">Missions</a>
+          <a href="/links.html" class="nav-item active">Links</a>
+          <a href="/brain.html" class="nav-item">Brain</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color: #9ca3af">v1.0</span>
+        <span class="text-xs font-mono px-2 py-1 rounded" style="background: #065f46; color: #4ade80">● LIVE</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Links Manager</h1>
+        <p class="text-sm" style="color: #9ca3af">Landing pages and categorized resource lists</p>
+      </div>
+    </div>
+
+    <div class="panel p-5 mb-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">TAN Websites</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="landingPages">
+        <a href="https://lemonadestandui.vercel.app" target="_blank" class="block p-4 rounded-lg border border-lms-border hover:border-lms-amber transition-colors" style="background: rgba(0,0,0,0.2)">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="status-dot active"></span>
+            <span class="font-semibold text-sm">Lemonade Stand</span>
+          </div>
+          <p class="text-xs" style="color: #9ca3af">Deal intelligence, loop automation, mission control</p>
+          <p class="text-xs mt-2 font-mono" style="color: #60a5fa">lemonadestandui.vercel.app</p>
+        </a>
+        <a href="https://quantum-tan-alpha.vercel.app" target="_blank" class="block p-4 rounded-lg border border-lms-border hover:border-lms-amber transition-colors" style="background: rgba(0,0,0,0.2)">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="status-dot active"></span>
+            <span class="font-semibold text-sm">Quantum TAN Alpha</span>
+          </div>
+          <p class="text-xs" style="color: #9ca3af">Quantum Journal, Sadhana Builder, consciousness tools</p>
+          <p class="text-xs mt-2 font-mono" style="color: #60a5fa">quantum-tan-alpha.vercel.app</p>
+        </a>
+        <a href="https://marketpeace.vercel.app" target="_blank" class="block p-4 rounded-lg border border-lms-border hover:border-lms-amber transition-colors" style="background: rgba(0,0,0,0.2)">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="status-dot active"></span>
+            <span class="font-semibold text-sm">Marketpeace</span>
+          </div>
+          <p class="text-xs" style="color: #9ca3af">Event-planning AI backend</p>
+          <p class="text-xs mt-2 font-mono" style="color: #60a5fa">marketpeace.vercel.app</p>
+        </a>
+      </div>
+    </div>
+
+    <div class="panel p-5">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Categorized Lists</h2>
+      </div>
+      <div class="space-y-3" id="linkCategories">
+        <div class="text-sm text-center py-6" style="color: #6b7280">No links saved yet</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function goBack() {
+      if (window.history.length > 1) { window.history.back(); }
+      else { window.location.href = '/'; }
+    }
+  </script>
+</body>
+</html>

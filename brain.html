@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // BRAIN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' }
+          },
+          fontFamily: { mono: ['Courier New', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all 0.2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn-blue { background: transparent; color: #60a5fa; border-color: #60a5fa; }
+    .btn-blue:hover { background: rgba(96, 165, 250, 0.12); color: #93c5fd; }
+    input, select, textarea { background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 100%; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background: #111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-lg font-bold font-mono tracking-wider" style="color: #fbbf24">LMS</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item">QLA Bot</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item">Missions</a>
+          <a href="/links.html" class="nav-item">Links</a>
+          <a href="/brain.html" class="nav-item active">Brain</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color: #9ca3af">v1.0</span>
+        <span class="text-xs font-mono px-2 py-1 rounded" style="background: #065f46; color: #4ade80">● LIVE</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Brain Status</h1>
+        <p class="text-sm" style="color: #9ca3af">Knowledge Brain + AI Brain status and URL ingestion</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="panel p-5">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Knowledge Brain</h2>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span style="color: #9ca3af">Status:</span><span style="color: #4ade80">● Active</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Items:</span><span id="kbCount">2,979</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Source:</span><span>Your First $100M PDF</span></div>
+        </div>
+      </div>
+
+      <div class="panel p-5">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">AI Brain</h2>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span style="color: #9ca3af">Status:</span><span style="color: #4ade80">● Active</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Items:</span><span id="aiCount">4</span></div>
+          <div class="flex justify-between"><span style="color: #9ca3af">Sources:</span><span>Articles, Guides</span></div>
+        </div>
+      </div>
+
+      <div class="panel p-5 md:col-span-2">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Ingest URL</h2>
+        </div>
+        <div class="flex gap-3">
+          <input type="text" id="ingestUrl" placeholder="Paste URL to ingest (article, Twitter, GitHub...)..." class="flex-1">
+          <button class="btn btn-amber" onclick="ingestUrl()">Ingest</button>
+        </div>
+        <div id="ingestResult" class="mt-3 text-sm" style="display:none"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function goBack() {
+      if (window.history.length > 1) { window.history.back(); }
+      else { window.location.href = '/'; }
+    }
+
+    function ingestUrl() {
+      const url = document.getElementById('ingestUrl').value.trim();
+      if (!url) { alert('Please enter URL'); return; }
+      document.getElementById('ingestResult').style.display = 'block';
+      document.getElementById('ingestResult').innerHTML = '<span style="color:#4ade80">✓ URL queued for ingestion:</span> ' + url;
+      document.getElementById('ingestUrl').value = '';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // QLA BOT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' }
+          },
+          fontFamily: { mono: ['Courier New', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all 0.2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn-blue { background: transparent; color: #60a5fa; border-color: #60a5fa; }
+    .btn-blue:hover { background: rgba(96, 165, 250, 0.12); color: #93c5fd; }
+    .btn-green { background: transparent; color: #4ade80; border-color: #4ade80; }
+    .btn-green:hover { background: rgba(74, 222, 128, 0.12); color: #86efac; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .status-dot.active { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+    .pill { padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+    input, select, textarea { background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 100%; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background: #111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-lg font-bold font-mono tracking-wider" style="color: #fbbf24">LMS</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item active">QLA Bot</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item">Missions</a>
+          <a href="/links.html" class="nav-item">Links</a>
+          <a href="/brain.html" class="nav-item">Brain</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color: #9ca3af">v1.0</span>
+        <span class="text-xs font-mono px-2 py-1 rounded" style="background: #065f46; color: #4ade80">● LIVE</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">QLA Bot</h1>
+        <p class="text-sm" style="color: #9ca3af">11-stage pipeline, list builders, deal automation</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="panel p-5">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Pipeline Status</h2>
+        </div>
+        <div class="space-y-3" id="pipelineStages">
+          <div class="flex items-center gap-2"><span class="status-dot active"></span><span class="text-sm">1. Target Sourcing</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot active"></span><span class="text-sm">2. Initial Contact</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">3. NDA</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">4. Document Request</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">5. Term Sheet</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">6. LOI</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">7. Due Diligence</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">8. Financing</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">9. Negotiation</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">10. Closing</span></div>
+          <div class="flex items-center gap-2"><span class="status-dot"></span><span class="text-sm">11. Integration</span></div>
+        </div>
+      </div>
+
+      <div class="panel p-5">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Create Deal</h2>
+        </div>
+        <div class="space-y-3">
+          <input type="text" id="dealCompany" placeholder="Target company name...">
+          <input type="text" id="dealVertical" placeholder="Vertical...">
+          <input type="text" id="dealGeo" placeholder="Geography...">
+          <button class="btn btn-green" onclick="createDeal()">Create Deal</button>
+        </div>
+      </div>
+
+      <div class="panel p-5">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Add Contact</h2>
+        </div>
+        <div class="space-y-3">
+          <input type="text" id="contactName" placeholder="Contact name...">
+          <input type="text" id="contactCompany" placeholder="Company...">
+          <select id="contactCategory">
+            <option value="board_member">Board Member</option>
+            <option value="accounting">Accounting Firm</option>
+            <option value="legal">Legal Firm</option>
+            <option value="bank">Bank</option>
+            <option value="financial">Financial Institution</option>
+            <option value="seller">Seller</option>
+            <option value="expert">Expert</option>
+            <option value="jv_partner">JV Partner</option>
+          </select>
+          <button class="btn btn-amber" onclick="addContact()">Add Contact</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel p-5 mt-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Build Board / Lists</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+        <button class="btn btn-ghost" onclick="buildList('board')">+ Board Members</button>
+        <button class="btn btn-ghost" onclick="buildList('accounting')">+ Accounting</button>
+        <button class="btn btn-ghost" onclick="buildList('legal')">+ Legal</button>
+        <button class="btn btn-ghost" onclick="buildList('banks')">+ Banks</button>
+        <button class="btn btn-ghost" onclick="buildList('financial')">+ Financial</button>
+        <button class="btn btn-ghost" onclick="buildList('experts')">+ Experts</button>
+        <button class="btn btn-ghost" onclick="buildList('jv')">+ JV Partners</button>
+        <button class="btn btn-ghost" onclick="buildList('sellers')">+ Sellers</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function goBack() {
+      if (window.history.length > 1) { window.history.back(); }
+      else { window.location.href = '/'; }
+    }
+
+    function createDeal() {
+      const company = document.getElementById('dealCompany').value.trim();
+      if (!company) { alert('Please enter company name'); return; }
+      alert('Deal created for: ' + company);
+    }
+
+    function addContact() {
+      const name = document.getElementById('contactName').value.trim();
+      if (!name) { alert('Please enter contact name'); return; }
+      alert('Contact added: ' + name);
+    }
+
+    function buildList(type) {
+      alert('Building list: ' + type);
+    }
+  </script>
+</body>
+</html>

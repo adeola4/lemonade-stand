@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // CONTENT STRATEGIST</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' }
+          },
+          fontFamily: { mono: ['Courier New', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all 0.2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn-green { background: transparent; color: #4ade80; border-color: #4ade80; }
+    .btn-green:hover { background: rgba(74, 222, 128, 0.12); color: #86efac; }
+    input, select, textarea { background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 100%; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24; }
+    label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; display: block; margin-bottom: 4px; }
+    .result-card { background: rgba(0,0,0,0.2); border: 1px solid #374151; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; }
+    .result-card h3 { color: #fbbf24; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
+    .tag-green { background: #065f46; color: #4ade80; }
+    .tag-blue { background: #1e3a8a; color: #60a5fa; }
+    .tag-amber { background: #78350f; color: #fbbf24; }
+    .tag-red { background: #7f1d1d; color: #f87171; }
+    .tag-purple { background: #581c87; color: #c084fc; }
+    .step-number { width: 28px; height: 28px; border-radius: 50%; background: #fbbf24; color: #111827; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; }
+    .score-bar { height: 6px; background: #374151; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .score-fill { height: 100%; border-radius: 3px; }
+    .lms-md h3 { color: #fbbf24; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 1.2rem 0 0.5rem 0; }
+    .lms-md h4 { color: #60a5fa; font-size: 13px; font-weight: 700; margin: 1rem 0 0.4rem 0; }
+    .lms-md-li { padding: 4px 0 4px 12px; font-size: 14px; line-height: 1.5; border-left: 2px solid #374151; margin: 4px 0; }
+    .lms-md-p { height: 8px; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background: #111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-lg font-bold font-mono tracking-wider" style="color: #fbbf24">LMS</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item">QLA Bot</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item">Missions</a>
+          <a href="/content-advisor.html" class="nav-item active">Content Strategist</a>
+          <a href="/links.html" class="nav-item">Links</a>
+          <a href="/brain.html" class="nav-item">Brain</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color: #9ca3af">v2.1</span>
+        <span class="text-xs font-mono px-2 py-1 rounded" style="background: #065f46; color: #4ade80">● LIVE</span>
+        <span id="llmBadge" class="text-xs font-mono px-2 py-1 rounded" style="background: #78350f; color: #fbbf24">🧠 AI CHECKING…</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Content Strategist</h1>
+        <p class="text-sm" style="color: #9ca3af">Market-data-driven assessment — what to make, how to monetize it, and why</p>
+      </div>
+    </div>
+
+    <!-- Input Section -->
+    <div class="panel p-5 mb-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Your Profile</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="userName">Your Name</label>
+          <input type="text" id="userName" placeholder="e.g. Sarah Chen">
+        </div>
+        <div>
+          <label for="userNiche">Your Niche / Industry</label>
+          <input type="text" id="userNiche" placeholder="e.g. B2B SaaS, Real Estate, Fitness, Finance">
+        </div>
+        <div class="md:col-span-2">
+          <label for="userStrengths">Your Strengths & Expertise</label>
+          <textarea id="userStrengths" rows="2" placeholder="What are you great at? e.g. Closing enterprise deals, on-camera teaching, data analysis, copywriting, public speaking..."></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <label for="userExperience">Relevant Experience</label>
+          <textarea id="userExperience" rows="2" placeholder="What have you done? e.g. Built a $2M agency, been a CPA for 12 years, ran a 50-person sales org..."></textarea>
+        </div>
+        <div>
+          <label for="userPersonality">On-Camera Personality</label>
+          <select id="userPersonality">
+            <option value="">— Select —</option>
+            <option value="charismatic">Charismatic & Energetic</option>
+            <option value="calm">Calm & Authoritative</option>
+            <option value="funny">Funny & Entertaining</option>
+            <option value="educational">Educational & Breakdown-focused</option>
+            <option value="intimate">Intimate & Storytelling</option>
+            <option value="introverted">Prefer Off-Camera / Behind the Scenes</option>
+          </select>
+        </div>
+        <div>
+          <label for="userTime">Available Time Per Week</label>
+          <select id="userTime">
+            <option value="">— Select —</option>
+            <option value="minimal">Minimal (1-3 hrs/week)</option>
+            <option value="moderate">Moderate (4-8 hrs/week)</option>
+            <option value="significant">Significant (9-20 hrs/week)</option>
+            <option value="fulltime">Full Time (20+ hrs/week)</option>
+          </select>
+        </div>
+        <div>
+          <label for="userEquipment">Equipment</label>
+          <select id="userEquipment">
+            <option value="">— Select —</option>
+            <option value="none">No equipment / Just phone</option>
+            <option value="basic">Basic (phone + laptop mic)</option>
+            <option value="intermediate">Intermediate (DSLR + editing)</option>
+            <option value="pro">Professional (multi-cam, studio)</option>
+          </select>
+        </div>
+        <div>
+          <label for="userGoal">Primary Goal</label>
+          <select id="userGoal">
+            <option value="">— Select —</option>
+            <option value="leads">Generate leads for my business</option>
+            <option value="authority">Build authority / personal brand</option>
+            <option value="audience">Grow an audience (monetize later)</option>
+            <option value="sales">Direct product/service sales</option>
+            <option value="ad-revenue">Maximize ad revenue (YouTube Partner, TikTok)</option>
+            <option value="community">Build a paid community</option>
+            <option value="sell-business">Build and sell the brand</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button class="btn btn-green" onclick="getRecommendation()">✨ Get My Strategy</button>
+        <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultSection" style="display:none">
+      <!-- Top Recommendation -->
+      <div class="panel p-5 mb-6" style="border-color: #fbbf24; box-shadow: 0 0 20px rgba(251,191,36,0.08);">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #4ade80">🎯 Your #1 Recommendation</h2>
+        </div>
+        <div id="topRecommendation"></div>
+      </div>
+
+      <!-- All Formats Scored -->
+      <div class="panel p-5 mb-6">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">📊 All Formats Scored</h2>
+        </div>
+        <div id="allScores"></div>
+      </div>
+
+      <!-- Why This Works (Market Context) -->
+      <div class="panel p-5 mb-6">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">📈 Why This Works — Market Data</h2>
+        </div>
+        <div id="marketContext"></div>
+      </div>
+
+      <!-- Your First 7 Posts -->
+      <div class="panel p-5 mb-6">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">🚀 Your First 7 Post Ideas</h2>
+        </div>
+        <div id="firstPosts"></div>
+      </div>
+
+      <!-- Monetization Path -->
+      <div class="panel p-5 mb-6">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">💰 Your Monetization Path</h2>
+        </div>
+        <div id="monetizationPath"></div>
+      </div>
+
+      <!-- Action Checklist -->
+      <div class="panel p-5">
+        <div class="panel-header">
+          <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">⚡ Launch Checklist</h2>
+        </div>
+        <div id="checklist"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ===== LIVE LLM BRIDGE (private tailnet — auto-fallback to deterministic) =====
+    const LLM_ENDPOINTS = [
+      'https://agent-openclaw.tailae9a9f.ts.net/v1/chat/completions',
+      'http://localhost:8645/v1/chat/completions',
+      'http://127.0.0.1:8645/v1/chat/completions'
+    ];
+    const LLM_MODEL = 'meituan/longcat-2.0:free';
+    let liveLLM = null; // null = unchecked, true = live, false = down
+
+    function setLLMBadge(state) {
+      const b = document.getElementById('llmBadge');
+      if (!b) return;
+      if (state === 'live') { b.textContent = '🧠 AI LIVE'; b.style.background = '#065f46'; b.style.color = '#4ade80'; }
+      else if (state === 'down') { b.textContent = '⚡ DETERMINISTIC'; b.style.background = '#374151'; b.style.color = '#9ca3af'; }
+      else { b.textContent = '🧠 AI CHECKING…'; b.style.background = '#78350f'; b.style.color = '#fbbf24'; }
+    }
+
+    async function probeLLM() {
+      if (liveLLM !== null) return liveLLM;
+      for (const ep of LLM_ENDPOINTS) {
+        try {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), 4000);
+          const r = await fetch(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer tailnet-user' },
+            body: JSON.stringify({ model: LLM_MODEL, messages: [{ role: 'user', content: 'Reply: OK' }], max_tokens: 200 }),
+            signal: ctrl.signal
+          });
+          clearTimeout(t);
+          if (r.ok) { liveLLM = true; setLLMBadge('live'); return true; }
+        } catch (e) { /* try next */ }
+      }
+      liveLLM = false;
+      setLLMBadge('down');
+      return false;
+    }
+
+    async function callLLM(systemPrompt, userPrompt, maxTokens = 4000) {
+      for (const ep of LLM_ENDPOINTS) {
+        try {
+          const r = await fetch(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer tailnet-user' },
+            body: JSON.stringify({
+              model: LLM_MODEL,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+              ],
+              max_tokens: maxTokens,
+              temperature: 0.7
+            })
+          });
+          if (!r.ok) continue;
+          const d = await r.json();
+          const content = d.choices?.[0]?.message?.content;
+          if (content && content.trim()) return { ok: true, text: content.trim(), endpoint: ep };
+        } catch (e) { /* next */ }
+      }
+      return { ok: false };
+    }
+
+    probeLLM(); // fire on load
+
+    // ===== CONTENT MARKET INTELLIGENCE DATABASE (2025-2026) =====
+    // Growth rates, CPMs, monetization data embedded as deterministic scoring weights
+
+    const MARKET_DATA = {
+      shortForm: {
+        name: "Short-Form Video",
+        platforms: ["TikTok", "Instagram Reels", "YouTube Shorts"],
+        growthRate: 95,           // 0-100 scale
+        avgCPM: 2.5,             // dollars per 1000 views
+        revenuePer10K: 25,       // ad revenue per 10K views
+        timePerVideo: 1.5,       // hours
+        freqRecommended: "1-3x/day",
+        barrierToEntry: 10,      // 0-100 (low = easy)
+        monetizationLag: 30,     // days to first dollar
+        styles: {
+          educational: {
+            name: "Educational Quick-Tips",
+            growth: 90,
+            cpm: 3.0,
+            bestFor: ["authority", "leads", "sales"],
+            description: "57-90 second breakdowns of one concept. Hook in first 1.2 seconds. Fastest-growing format on TikTok/Reels.",
+            topNiches: ["finance", "business", "tech", "health", "career"],
+            examples: ["3 tax deductions you're missing", "The 60-second negotiation script"]
+          },
+          storytime: {
+            name: "Storytime / Journey",
+            growth: 85,
+            cpm: 2.8,
+            bestFor: ["authority", "audience", "community"],
+            description: "Personal stories with a lesson. High saves and shares. Builds deep parasocial trust.",
+            topNiches: ["entrepreneurship", "fitness", "career", "personal-growth"],
+            examples: ["How I lost $50K and what it taught me", "Day in the life of a [your role]"]
+          },
+          commentary: {
+            name: "Reaction / Commentary",
+            growth: 88,
+            cpm: 2.6,
+            bestFor: ["audience", "authority", "community"],
+            description: "React to trending content in your niche. Taps into existing conversations. Lower production quality needed.",
+            topNiches: ["tech", "entertainment", "politics", "business", "culture"],
+            examples: ["Reacting to the [industry] news this week", "Why that viral [niche] take is wrong"]
+          },
+          behindTheScenes: {
+            name: "Behind-the-Scenes / Process",
+            growth: 82,
+            cpm: 2.4,
+            bestFor: ["authority", "sales", "leads"],
+            description: "Show your actual work. High trust builder for service-based businesses. Low competition in most niches.",
+            topNiches: ["agency", "consulting", "creative", "ecommerce", "coaching"],
+            examples: ["How I actually close a $10K deal", "My morning routine that keeps me productive"]
+          },
+          transformation: {
+            name: "Transformation / Before-After",
+            growth: 80,
+            cpm: 2.2,
+            bestFor: ["sales", "authority", "leads"],
+            description: "Visual proof of results. Works for any outcome-based niche. High conversion to offers.",
+            topNiches: ["fitness", "business", "finance", "health", "career"],
+            examples: ["$0 to $10K/mo in 90 days — here's the timeline", "Client before/after with our method"]
+          }
+        }
+      },
+      longForm: {
+        name: "Long-Form Video / Podcast",
+        platforms: ["YouTube", "Spotify", "Apple Podcasts"],
+        growthRate: 72,
+        avgCPM: 8.0,
+        revenuePer10K: 80,
+        timePerVideo: 6,
+        freqRecommended: "1-3x/week",
+        barrierToEntry: 55,
+        monetizationLag: 90,
+        styles: {
+          tutorial: {
+            name: "In-Depth Tutorial / Course-Style",
+            growth: 78,
+            cpm: 9.5,
+            bestFor: ["authority", "sales", "leads"],
+            description: "10-30 minute comprehensive how-to. Highest CPM format on YouTube. Searchable forever — compounding asset.",
+            topNiches: ["tech", "creative", "business", "education", "finance"],
+            examples: ["Complete guide to X in 2026", "How to Y — step by step"]
+          },
+          documentary: {
+            name: "Documentary / Profile / Deep-Dive",
+            growth: 75,
+            cpm: 7.0,
+            bestFor: ["authority", "audience", "community"],
+            description: "Long-form storytelling about people, companies, or trends. High watch time. Premium brand perception.",
+            topNiches: ["business", "entrepreneurship", "tech", "culture"],
+            examples: ["[The untold story of X company]", "[How Y industry actually works]"]
+          },
+          interview: {
+            name: "Interview / Conversation",
+            growth: 70,
+            cpm: 6.5,
+            bestFor: ["authority", "community", "audience"],
+            description: "Bring on guests with audiences. Leverages their reach. Low prep if you're a good conversationalist.",
+            topNiches: ["business", "tech", "entertainment", "self-improvement"],
+            examples: ["[Expert] reveals the truth about [topic]", "[Industry leader] on what's coming in 2026]"]
+          },
+          whiteboard: {
+            name: "Whiteboard Education / Framework Breakdown",
+            growth: 80,
+            cpm: 10.0,
+            bestFor: ["authority", "sales", "leads"],
+            description: "Draw frameworks, break down systems, explain with visual aids. Highest CPM of all long-form. Defensible moat — hard to copy.",
+            topNiches: ["business", "marketing", "sales", "finance", "productivity"],
+            examples: ["[The 5-phase framework for X]", "[How to think about Y — with diagrams]"]
+          },
+          liveBuild: {
+            name: "Hands-On Building / Build in Public",
+            growth: 76,
+            cpm: 7.5,
+            bestFor: ["authority", "community", "sales"],
+            description: "Build something on camera. Software, art, business, product. High engagement, loyal following.",
+            topNiches: ["tech", "creative", "entrepreneurship", "maker"],
+            examples: ["[Building X from scratch — full process]", "[I built $Y business in Z days]"]
+          }
+        }
+      },
+      livestream: {
+        name: "Live Streaming",
+        platforms: ["Twitch", "YouTube Live", "TikTok LIVE", "Instagram Live"],
+        growthRate: 65,
+        avgCPM: 4.0,
+        revenuePer10K: 0,        // not ad-based
+        timePerVideo: 2,
+        freqRecommended: "3-7x/week",
+        barrierToEntry: 30,
+        monetizationLag: 14,
+        styles: {
+          cowork: {
+            name: "Co-Working / Body Doubling",
+            growth: 60,
+            cpm: 0,
+            bestFor: ["community", "authority"],
+            description: "Work on camera while chat interacts. Low pressure. High viewer hours. Growing fast in creator economy.",
+            topNiches: ["creative", "tech", "entrepreneurship", "student"],
+            examples: ["[Building my startup live — ask me anything]", "[Editing videos live with chat]"]
+          },
+          liveQA: {
+            name: "Live Q&A / AMA",
+            growth: 72,
+            cpm: 0,
+            bestFor: ["authority", "community", "leads"],
+            description: "Answer questions in real-time. Fastest trust builder. Converts viewers to buyers if you sell.",
+            topNiches: ["business", "finance", "health", "career", "coaching"],
+            examples: ["[Ask me anything about X — live]", "[Live coaching call — apply your questions]"]
+          },
+          liveBuild: {
+            name: "Live Building / Creating",
+            growth: 68,
+            cpm: 0,
+            bestFor: ["authority", "community", "audience"],
+            description: "Build or create something live. Authentic. Chat influences decisions. Very high engagement.",
+            topNiches: ["tech", "creative", "maker", "entrepreneurship"],
+            examples: ["[Coding a product live with chat input]", "[Designing a brand live — you pick the direction]"]
+          },
+          podcastLive: {
+            name: "Live Podcast / Conversation",
+            growth: 65,
+            cpm: 0,
+            bestFor: ["authority", "community", "audience"],
+            description: "Live version of your podcast. Chat can submit questions mid-episode. Leverages both formats.",
+            topNiches: ["business", "tech", "entertainment", "culture"],
+            examples: ["[Live podcast recording — submit topics]", "[Conversation about X — live with chat]"]
+          }
+        }
+      },
+      written: {
+        name: "Written Posts / Newsletters",
+        platforms: ["Substack", "LinkedIn", "Twitter/X", "Medium"],
+        growthRate: 60,
+        avgCPM: 12.0,
+        revenuePer10K: 120,      // via subscriptions
+        timePerVideo: 0.5,
+        freqRecommended: "2-5x/week",
+        barrierToEntry: 5,
+        monetizationLag: 30,
+        styles: {
+          essay: {
+            name: "Long-Form Essay / Newsletter",
+            growth: 65,
+            cpm: 0,
+            bestFor: ["authority", "sales", "leads"],
+            description: "1000-3000 word deep dives. Highest subscriber conversion. Premium perception. Builds defensible audience.",
+            topNiches: ["business", "tech", "finance", "culture", "politics"],
+            examples: ["[The [niche] playbook: 5 lessons from 10 years]", "[Why most people get X wrong]"]
+          },
+          thread: {
+            name: "Thread / Bullet Points",
+            growth: 70,
+            cpm: 0,
+            bestFor: ["authority", "audience", "leads"],
+            description: "Multi-post breakdowns on X/LinkedIn. Highest organic reach of any written format. Saves = algorithm fuel.",
+            topNiches: ["business", "tech", "marketing", "career", "sales"],
+            examples: ["[10 [niche] lessons I wish I knew at 20]", "[The exact framework I use for X — thread]"]
+          },
+          caseStudy: {
+            name: "Case Study / Client Result",
+            growth: 55,
+            cpm: 0,
+            bestFor: ["leads", "sales", "authority"],
+            description: "Document real results with data. Highest-converting format for service businesses. Low volume, high intent.",
+            topNiches: ["agency", "consulting", "coaching", "b2b", "marketing"],
+            examples: ["[How we helped [client] achieve $X in Y days]", "[Case study: X strategy → Y result]"]
+          },
+          hotTake: {
+            name: "Hot Take / Controversial",
+            growth: 75,
+            cpm: 0,
+            bestFor: ["audience", "authority"],
+            description: "Challenge conventional wisdom. High engagement (comments = reach). Polarizing but builds fast.",
+            topNiches: ["business", "tech", "culture", "career", "finance"],
+            examples: ["[Unpopular opinion: X is dead]", "[Why everyone is wrong about Y]"]
+          }
+        }
+      },
+      carousel: {
+        name: "Carousels / Slide Decks",
+        platforms: ["LinkedIn", "Instagram", "X"],
+        growthRate: 55,
+        avgCPM: 0,
+        revenuePer10K: 0,
+        timePerVideo: 1.5,
+        freqRecommended: "3-5x/week",
+        barrierToEntry: 20,
+        monetizationLag: 7,
+        styles: {
+          framework: {
+            name: "Framework / Model Breakdown",
+            growth: 62,
+            cpm: 0,
+            bestFor: ["authority", "leads", "sales"],
+            description: "Teach a mental model in 10 slides. Saves and shares = algorithm boost. Positions you as the expert.",
+            topNiches: ["business", "marketing", "sales", "leadership", "productivity"],
+            examples: ["[The 4-phase model for X]", "[How to think about Y — visual guide]"]
+          },
+          mythBust: {
+            name: "Myth-Busting / Misconceptions",
+            growth: 58,
+            cpm: 0,
+            bestFor: ["authority", "audience", "leads"],
+            description: "List common myths and the truth. High save rate. High share rate. Works in every niche.",
+            topNiches: ["health", "finance", "career", "business", "education"],
+            examples: ["[5 [niche] myths that cost you money]", "[What people get wrong about X]"]
+          },
+          stepByStep: {
+            name: "Step-by-Step Guide",
+            growth: 55,
+            cpm: 0,
+            bestFor: ["authority", "sales", "leads"],
+            description: "Walk through a process in slides. Practical value. High bookmark/save rate. Evergreen traffic.",
+            topNiches: ["creative", "tech", "marketing", "business", "productivity"],
+            examples: ["[How to X in 7 steps (slide guide)]", "[Complete Y checklist]"]
+          },
+          dataViz: {
+            name: "Data Visualization / Charts",
+            growth: 60,
+            cpm: 0,
+            bestFor: ["authority", "audience"],
+            description: "Present data visually. Citable. Shareable. Positions you as research-driven.",
+            topNiches: ["finance", "tech", "business", "health", "marketing"],
+            examples: ["[The numbers behind X trend]", "[Y industry by the numbers — 2026]"]
+          }
+        }
+      },
+      faceless: {
+        name: "Faceless / Anonymous Brand",
+        platforms: ["TikTok", "Instagram", "YouTube", "X"],
+        growthRate: 70,
+        avgCPM: 2.0,
+        revenuePer10K: 20,
+        timePerVideo: 2,
+        freqRecommended: "1-2x/day",
+        barrierToEntry: 40,
+        monetizationLag: 14,
+        styles: {
+          compilation: {
+            name: "Compilation / List / Curated",
+            growth: 72,
+            cpm: 2.2,
+            bestFor: ["audience", "ad-revenue"],
+            description: "Curate clips, data, or insights around a theme. No on-face needed. Scales with volume. Passive-friendly.",
+            topNiches: ["finance", "motivation", "facts", "animations", "business"],
+            examples: ["[10 [niche] facts that will blow your mind]", "[Best of X this week — curated]"]
+          },
+          narrated: {
+            name: "Narrated Stories / Reddit Reads",
+            growth: 68,
+            cpm: 2.0,
+            bestFor: ["audience", "ad-revenue"],
+            description: "Voice-over stories from Reddit or other sources. Low effort. High watch time. YouTube algorithm loves it.",
+            topNiches: ["relationships", "workplace", "finance", "scary", "legal"],
+            examples: ["[Reddit stories about X — narrated]", "[The craziest [niche] stories this week]"]
+          },
+          animatedEd: {
+            name: "Animated Education / Explainer",
+            growth: 75,
+            cpm: 3.5,
+            bestFor: ["authority", "audience", "ad-revenue"],
+            description: "Animate explanations of complex topics. High CPM. Evergreen. Searchable. The \"Kurzgesagt\" model.",
+            topNiches: ["science", "economics", "tech", "philosophy", "history"],
+            examples: ["[How X actually works — animated]", "[The science of Y in 60 seconds]"]
+          },
+          quotes: {
+            name: "Quote / Text-on-Video",
+            growth: 50,
+            cpm: 1.5,
+            bestFor: ["audience", "ad-revenue"],
+            description: "Motivational or educational quotes over stock/video. Fastest to produce. Lowest CPM. High volume play.",
+            topNiches: ["motivation", "business", "fitness", "mindset"],
+            examples: ["[Quote from famous X about Y]", "[3 truths about Z]"]
+          }
+        }
+      }
+    };
+
+    // ===== STYLE SCORING ENGINE =====
+    async function getRecommendation() {
+      const profile = {
+        name: document.getElementById('userName').value.trim() || 'You',
+        niche: document.getElementById('userNiche').value.trim().toLowerCase(),
+        strengths: document.getElementById('userStrengths').value.trim().toLowerCase(),
+        experience: document.getElementById('userExperience').value.trim().toLowerCase(),
+        personality: document.getElementById('userPersonality').value,
+        time: document.getElementById('userTime').value,
+        equipment: document.getElementById('userEquipment').value,
+        goal: document.getElementById('userGoal').value,
+        fullStrengths: document.getElementById('userStrengths').value.trim() + ' ' + document.getElementById('userExperience').value.trim()
+      };
+
+      if (!profile.niche && !profile.strengths && !profile.experience) {
+        alert('Please fill in at least your niche, strengths, or experience');
+        return;
+      }
+
+      // Show loading state
+      const btn = document.querySelector('.btn-green');
+      const btnText = btn.innerHTML;
+      btn.innerHTML = '🧠 Analyzing…';
+      btn.disabled = true;
+
+      // Try live LLM first
+      const isLive = await probeLLM();
+      let llmResult = null;
+      if (isLive) {
+        llmResult = await generateLLMStrategy(profile);
+      }
+
+      // Restore button
+      btn.innerHTML = btnText;
+      btn.disabled = false;
+
+      if (llmResult) {
+        displayLLMResults(llmResult, profile);
+      } else {
+        const analysis = analyzeProfile(profile);
+        displayResults(analysis, profile);
+      }
+    }
+
+    async function generateLLMStrategy(p) {
+      const systemPrompt = `You are an elite content strategy advisor for creators and business owners. You know the 2025-2026 content market cold: platform algorithms, CPM rates, monetization timelines, format growth rates, and which styles are rising vs dying.
+
+You give BRUTALLY specific, actionable advice. No fluff, no generic platitudes. You tell people exactly what to make, where, how often, and how they'll make money from it.
+
+Respond in clean markdown with these sections (use ## headers):
+## 🎯 Your #1 Play
+The single best format+style combo for this person. Name the exact style (e.g. "whiteboard education on YouTube", "faceless AI-narrated documentaries"). Explain WHY in 2-3 sentences tied to their specific profile.
+
+## 📊 The Numbers
+Growth rate, CPM range, time-to-first-dollar, realistic 90-day expectations. Be honest about difficulty.
+
+## 🎨 Style Deep-Dive
+Exactly how to execute the style: structure, length, hooks, cadence. 4-6 bullet points.
+
+## 🔹 Backup Format
+Second-best format and when to use it.
+
+## 🚀 Your First 7 Posts
+Seven specific post ideas with titles/hooks tailored to their niche and experience. Numbered list. Each one concrete enough to film/write today.
+
+## 💰 Monetization Path
+Step-by-step from 0 to first dollar, then to sustainable income. Include realistic numbers and timelines for their goal.
+
+## ⚡ This Week
+Exactly what to do in the next 7 days. 5 concrete actions.
+
+Be direct. If their profile has weaknesses, say so. If a format is a bad fit, say why.`;
+
+      const userPrompt = `Profile:
+- Name: ${p.name}
+- Niche: ${p.niche || 'not specified'}
+- Strengths: ${p.fullStrengths || 'not specified'}
+- On-camera personality: ${p.personality || 'not specified'}
+- Time available: ${p.time || 'not specified'}
+- Equipment: ${p.equipment || 'not specified'}
+- Primary goal: ${p.goal || 'not specified'}
+
+Give this person their complete content strategy.`;
+
+      const res = await callLLM(systemPrompt, userPrompt, 6000);
+      if (res.ok) return { markdown: res.text, endpoint: res.endpoint };
+      return null;
+    }
+
+    // Simple markdown renderer for LLM output
+    function renderMarkdown(md) {
+      let html = md
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^## (.+)$/gm, '<h3 class="lms-md-h">$1</h3>')
+        .replace(/^### (.+)$/gm, '<h4 class="lms-md-h4">$1</h4>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/^- (.+)$/gm, '<div class="lms-md-li">• $1</div>')
+        .replace(/^(\d+)\. (.+)$/gm, '<div class="lms-md-li"><strong>$1.</strong> $2</div>')
+        .replace(/\n\n/g, '<div class="lms-md-p"></div>')
+        .replace(/\n/g, '<br>');
+      return html;
+    }
+
+    function displayLLMResults(llm, p) {
+      const section = document.getElementById('resultSection');
+      section.style.display = 'block';
+
+      document.getElementById('topRecommendation').innerHTML = `
+        <div class="mb-2" style="color:#4ade80;font-size:12px;font-family:monospace">⚡ GENERATED BY LIVE AI — meituan/longcat-2.0:free</div>
+        <div class="lms-md">${renderMarkdown(llm.markdown)}</div>
+      `;
+      document.getElementById('allScores').innerHTML = `
+        <div class="text-sm" style="color:#9ca3af">AI mode: full reasoned strategy generated above. The deterministic scoring engine is below as reference.</div>
+        <div id="deterministicRef"></div>
+      `;
+      document.getElementById('marketContext').innerHTML = '<div class="text-sm" style="color:#9ca3af">Covered in the AI strategy above.</div>';
+      document.getElementById('firstPosts').innerHTML = '<div class="text-sm" mode-deterministic style="color:#9ca3af">Covered in the AI strategy above.</div>';
+      // Run deterministic engine silently for the score panel
+      const analysis = analyzeProfile(p);
+      document.getElementById('deterministicRef').innerHTML = analysis.sortedFormats.map(([key, scores], i) => {
+        const f = MARKET_DATA[key];
+        const bestStyle = analysis.formatStyles[key][0];
+        return `<div class="flex items-center justify-between py-2 ${i > 0 ? 'border-t border-lms-border' : ''}">
+          <div><strong style="font-size:13px">${i+1}. ${f.name}</strong> <span class="tag tag-blue" style="font-size:10px">${bestStyle.name}</span></div>
+          <div class="font-bold" style="color:${i===0?'#4ade80':'#9ca3af'}">${scores.total}</div>
+        </div>`;
+      }).join('');
+      document.getElementById('monetizationPath').innerHTML = '<div class="text-sm" style="color:#9ca3af">Covered in the AI strategy above.</div>';
+      document.getElementById('checklist').innerHTML = '<div class="text-sm" style="color:#9ca3af">See "This Week" in the AI strategy above.</div>';
+
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function analyzeProfile(p) {
+      // Score each FORMAT (top-level)
+      const formatScores = {};
+      for (const [formatKey, format] of Object.entries(MARKET_DATA)) {
+        formatScores[formatKey] = scoreFormat(formatKey, format, p);
+      }
+
+      // Sort formats by total score
+      const sortedFormats = Object.entries(formatScores)
+        .sort((a, b) => b[1].total - a[1].total);
+
+      // For each format, find the best style
+      const formatStyles = {};
+      for (const [formatKey, format] of Object.entries(MARKET_DATA)) {
+        const styleScores = [];
+        for (const [styleKey, style] of Object.entries(format.styles)) {
+          styleScores.push({
+            key: styleKey,
+            ...style,
+            matchScore: scoreStyle(style, p, formatKey)
+          });
+        }
+        styleScores.sort((a, b) => b.matchScore - a.matchMatch);
+        formatStyles[formatKey] = styleScores;
+      }
+
+      return { formatScores, sortedFormats, formatStyles };
+    }
+
+    function scoreFormat(key, format, p) {
+      let total = 0;
+      const breakdown = {};
+
+      // 1. Goal fit (30 points)
+      let goalScore = 0;
+      for (const style of Object.values(format.styles)) {
+        if (style.bestFor.includes(p.goal)) goalScore += 5;
+      }
+      goalScore = Math.min(30, goalScore);
+      breakdown.goal = goalScore;
+      total += goalScore;
+
+      // 2. Time availability fit (25 points)
+      let timeScore = 0;
+      const timeHours = { minimal: 2, moderate: 6, significant: 15, fulltime: 30 }[p.time] || 0;
+      const timePerPost = format.timePerVideo;
+      const postsPerWeek = timeHours / timePerPost;
+      const requiredFreq = { shortForm: 14, longForm: 3, livestream: 5, written: 10, carousel: 5, faceless: 10 }[key] || 5;
+      if (postsPerWeek >= requiredFreq * 1.5) timeScore = 25;
+      else if (postsPerWeek >= requiredFreq) timeScore = 20;
+      else if (postsPerWeek >= requiredFreq * 0.5) timeScore = 10;
+      else timeScore = 5;
+      breakdown.time = timeScore;
+      total += timeScore;
+
+      // 3. Equipment fit (20 points)
+      let equipScore = 0;
+      if (p.equipment === 'none') {
+        equipScore = (key === 'written') ? 20 : (key === 'carousel') ? 15 : (key === 'faceless') ? 10 : 0;
+      } else if (p.equipment === 'basic') {
+        equipScore = (key === 'shortForm' || key === 'written' || key === 'carousel') ? 15 : (key === 'livestream') ? 10 : 5;
+      } else if (p.equipment === 'intermediate') {
+        equipScore = 15;
+      } else if (p.equipment === 'pro') {
+        equipScore = 20;
+      }
+      breakdown.equip = equipScore;
+      total += equipScore;
+
+      // 4. Personality fit (25 points)
+      let persScore = 0;
+      const personalityWeights = {
+        charismatic: { shortForm: 25, livestream: 25, longForm: 15, written: 10, carousel: 10, faceless: 5 },
+        calm: { longForm: 25, written: 20, faceless: 20, carousel: 18, shortForm: 8, livestream: 10 },
+        funny: { shortForm: 25, livestream: 20, longForm: 10, written: 15, carousel: 5, faceless: 5 },
+        educational: { longForm: 20, carousel: 22, faceless: 18, written: 18, shortForm: 10, livestream: 8 },
+        intimate: { longForm: 25, livestream: 20, written: 18, shortForm: 5, carousel: 10, faceless: 5 },
+        introverted: { written: 25, faceless: 25, carousel: 22, longForm: 10, shortForm: 2, livestream: 0 }
+      };
+      persScore = (personalityWeights[p.personality] && personalityWeights[p.personality][key]) || 10;
+      breakdown.personality = persScore;
+      total += persScore;
+
+      // 5. Market opportunity bonus (15 points) — growth rate weighted
+      const marketBonus = Math.round((format.growthRate / 100) * 15);
+      breakdown.market = marketBonus;
+      total += marketBonus;
+
+      // 6. Monetization speed bonus (10 points) — how fast to first dollar
+      const speedScore = Math.round(((100 - format.monetizationLag) / 100) * 10);
+      breakdown.speed = speedScore;
+      total += speedScore;
+
+      // 7. Niche-format affinity bonus (10 points)
+      let nicheBonus = 0;
+      const nicheFormatAffinity = {
+        'short-form': ['fitness', 'career', 'comedy', 'entertainment', 'finance', 'health', 'beauty', 'food', 'fashion', 'motivation'],
+        'long-form': ['business', 'tech', 'education', 'science', 'finance', 'entertainment', 'health', 'career'],
+        'livestream': ['gaming', 'creative', 'entertainment', 'tech', 'music', 'business'],
+        'written': ['business', 'tech', 'finance', 'career', 'marketing', 'sales', 'leadership', 'culture', 'politics'],
+        'carousel': ['business', 'marketing', 'sales', 'leadership', 'career', 'tech', 'finance', 'education'],
+        'faceless': ['finance', 'motivation', 'facts', 'animation', 'business', 'education', 'science']
+      };
+      if (nicheFormatAffinity[key] && p.niche && nicheFormatAffinity[key].some(n => p.niche.includes(n))) {
+        nicheBonus = 10;
+      }
+      breakdown.niche = nicheBonus;
+      total += nicheBonus;
+
+      return { total, breakdown };
+    }
+
+    function scoreStyle(style, p, formatKey) {
+      let score = 0;
+
+      // Goal alignment
+      if (style.bestFor.includes(p.goal)) score += 30;
+
+      // Growth rate
+      score += (style.growthRate / 100) * 25;
+
+      // Niche-style affinity
+      if (style.topNiches && p.niche && style.topNiches.some(n => p.niche.includes(n))) {
+        score += 20;
+      }
+
+      // Strengths-text match
+      const searchText = p.niche + ' ' + p.strengths + ' ' + p.experience;
+      const keywords = (style.name.toLowerCase().split(/\s+/)).concat((style.examples || []).join(' ').toLowerCase().split(/\s+/));
+      for (const kw of keywords) {
+        if (kw.length > 3 && searchText.includes(kw)) {
+          score += 2;
+        }
+      }
+
+      // Time efficiency bonus (if time-constrained, prefer lower time-per-post)
+      if (p.time === 'minimal' && MARKET_DATA[formatKey].timePerVideo <= 1) score += 15;
+      if (p.time === 'moderate' && MARKET_DATA[formatKey].timePerVideo <= 2) score += 10;
+
+      // Personality bonus
+      if (p.personality === 'educational' && style.name.toLowerCase().includes('educ')) score += 10;
+      if (p.personality === 'introverted' && (style.name.toLowerCase().includes('faceless') || style.name.toLowerCase().includes('written'))) score += 10;
+
+      return Math.round(score);
+    }
+
+    function displayResults(analysis, p) {
+      const section = document.getElementById('resultSection');
+      section.style.display = 'block';
+
+      const top = analysis.sortedFormats[0];
+      const topFormatKey = top[0];
+      const topFormat = MARKET_DATA[topFormatKey];
+      const topStyle = analysis.formatStyles[topFormatKey][0];
+
+      // === Top Recommendation ===
+      document.getElementById('topRecommendation').innerHTML = `
+        <div class="mb-3">
+          <span class="tag tag-green" style="font-size:13px;padding:6px 16px">${topFormat.name}</span>
+          <span class="tag tag-amber" style="font-size:13px;padding:6px 16px">Best Style: ${topStyle.name}</span>
+        </div>
+        <p class="text-base mb-3">${topStyle.description}</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+          <div class="text-center p-3 rounded" style="background:rgba(0,0,0,0.3)">
+            <div class="text-lg font-bold" style="color:#4ade80">${topFormat.growthRate}%</div>
+            <div class="text-xs" style="color:#9ca3af">Growth Rate</div>
+          </div>
+          <div class="text-center p-3 rounded" style="background:rgba(0,0,0,0.3)">
+            <div class="text-lg font-bold" style="color:#fbbf24">$${topFormat.avgCPM}</div>
+            <div class="text-xs" style="color:#9ca3af">Avg CPM (per 1K)</div>
+          </div>
+          <div class="text-center p-3 rounded" style="background:rgba(0,0,0,0.3)">
+            <div class="text-lg font-bold" style="color:#60a5fa">${topFormat.freqRecommended}</div>
+            <div class="text-xs" style="color:#9ca3af">Post Frequency</div>
+          </div>
+          <div class="text-center p-3 rounded" style="background:rgba(0,0,0,0.3)">
+            <div class="text-lg font-bold" style="color:#c084fc">${topFormat.monetizationLag} days</div>
+            <div class="text-xs" style="color:#9ca3af">To First Dollar</div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <strong style="color:#9ca3af;font-size:11px;text-transform:uppercase">Platforms:</strong>
+          <span class="ml-2">${topFormat.platforms.join(' • ')}</span>
+        </div>
+        <div class="mb-2">
+          <strong style="color:#9ca3af;font-size:11px;text-transform:uppercase">Why this fits YOU:</strong>
+          <p class="text-sm mt-1">${generateWhyThisFits(topFormat, topStyle, p)}</p>
+        </div>
+      `;
+
+      // === All Formats Scored ===
+      document.getElementById('allScores').innerHTML = analysis.sortedFormats.map(([key, scores], i) => {
+        const f = MARKET_DATA[key];
+        const bestStyle = analysis.formatStyles[key][0];
+        const pct = Math.min(100, scores.total);
+        return `
+          <div class="flex items-center justify-between py-3 ${i > 0 ? 'border-t border-lms-border' : ''}">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span style="color:${i === 0 ? '#4ade80' : i === 1 ? '#fbbf24' : '#9ca3af'}">${i + 1}.</span>
+                <strong>${f.name}</strong>
+                <span class="tag tag-blue" style="font-size:10px">${bestStyle.name}</span>
+              </div>
+              <div class="score-bar mt-1" style="max-width:200px">
+                <div class="score-fill" style="width:${pct}%;background:${i === 0 ? '#4ade80' : i === 1 ? '#fbbf24' : '#60a5fa'}"></div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold" style="color:${i === 0 ? '#4ade80' : '#fbbf24'}">${scores.total}</div>
+              <div class="text-xs" style="color:#9ca3af">score</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // === Market Context ===
+      document.getElementById('marketContext').innerHTML = `
+        <div class="result-card">
+          <h3>📈 ${topFormat.name} Market Reality</h3>
+          <ul class="space-y-2 text-sm">
+            <li><strong style="color:#4ade80">Growth rate:</strong> ${topFormat.growthRate}/100 — ${topFormat.growthRate >= 80 ? 'Explosive — algorithm is actively pushing this format' : topFormat.growthRate >= 60 ? 'Strong — consistent upward trajectory' : 'Stable — reliable but not trending'}</li>
+            <li><strong style="color:#fbbf24">Avg CPM:</strong> $${topFormat.avgCPM} per 1,000 views — ${topFormat.avgCPM >= 8 ? 'Premium tier — advertisers pay top dollar' : topFormat.avgCPM >= 4 ? 'Mid-tier — solid for volume' : 'Volume game — you need reach to scale'}</li>
+            <li><strong style="color:#60a5fa">Monetization speed:</strong> ${topFormat.monetizationLag} days to first dollar — ${topFormat.monetizationLag <= 14 ? 'Fast — you can start earning within weeks' : topFormat.monetizationLag <= 30 ? 'Moderate — 1-2 months to traction' : 'Longer — this is a compounding play, not quick cash'}</li>
+            <li><strong style="color:#c084fc">Best for:</strong> ${p.goal ? `<strong>${formatGoal(p.goal)}</strong> — this format converts best for your specific goal` : 'Your goal'}</li>
+          </ul>
+        </div>
+        <div class="result-card">
+          <h3>🎨 Style Spotlight: ${topStyle.name}</h3>
+          <p class="text-sm mb-2">${topStyle.description}</p>
+          <p class="text-sm"><strong style="color:#9ca3af">Top niches using this style:</strong> ${(topStyle.topNiches || []).join(', ')}</p>
+        </div>
+      `;
+
+      // === First 7 Posts ===
+      document.getElementById('firstPosts').innerHTML = generateTopPosts(topFormat, topStyle, p).map((post, i) => `
+        <div class="flex items-start gap-2 mb-3">
+          <span class="step-number">${i + 1}</span>
+          <span class="text-sm">${post}</span>
+        </div>
+      `).join('');
+
+      // === Monetization Path ===
+      document.getElementById('monetizationPath').innerHTML = generateMonetizationPath(topFormat, topStyle, p);
+
+      // === Checklist ===
+      document.getElementById('checklist').innerHTML = generateChecklist(topFormat, topStyle, p);
+
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function generateWhyThisFits(format, style, p) {
+      const reasons = [];
+      if (p.personality) {
+        const pMap = {
+          charismatic: "your energy translates perfectly to short, punchy content",
+          calm: "your authoritative tone commands attention in longer formats",
+          funny: "humor is the #1 driver of shares in this format",
+          educational: "breaking down complex topics is exactly what this style rewards",
+          intimate: "your storytelling builds the deep trust this format demands",
+          introverted: "this format requires zero on-camera presence — pure substance"
+        };
+        reasons.push(pMap[p.personality]);
+      }
+      if (p.time) {
+        const tMap = { minimal: "fits your limited time", moderate: "comfortably fits your schedule", significant: "you have enough time to do this right", fulltime: "you can outwork competitors with this time commitment" };
+        reasons.push(tMap[p.time]);
+      }
+      if (p.equipment && p.equipment === 'none') reasons.push("requires zero special equipment");
+      if (p.equipment && p.equipment === 'pro') reasons.push("your production quality will dominate the feed");
+      return reasons.join('. ') + '.';
+    }
+
+    function generateTopPosts(format, style, p) {
+      const niche = p.niche || 'your industry';
+      const strength = p.strengths || 'your expertise';
+      const goal = p.goal || 'authority';
+
+      // Pull from style examples, customize with niche
+      const baseExamples = style.examples || [];
+      const posts = baseExamples.slice(0, 2).map(e => e.replace('[niche]', niche).replace('[your role]', niche + ' professional').replace('[Industry]', niche).replace('[industry]', niche));
+
+      // Add niche-specific posts
+      const nichePosts = {
+        'short-form': [
+          `Myth-bust a common misconception about ${niche} in 60 seconds`,
+          `Share your #1 lesson from ${strength} — make it punchy and quotable`,
+          `Day-in-the-life showing your real work in ${niche} (builds trust fast)`,
+          `React to a popular ${niche} take — agree or disagree with receipts`,
+          `One ${niche} tip most people get wrong — explain with visuals`,
+          `Before/after: Show a transformation you helped create in ${niche}`,
+          `"I wish someone told me this when I started ${niche}" — 30-sec advice`
+        ],
+        'long-form': [
+          `The state of ${niche} in 2026: What's actually working right now`,
+          `How I applied ${strength} and the results (case study format)`,
+          `${niche} fundamentals: Complete beginner-to-competent guide`,
+          `My honest journey in ${niche} — the failures, wins, and what I'd do differently`,
+          `Interview someone doing interesting work in ${niche} (borrow their audience)`,
+          `Whiteboard session: Break down a ${niche} framework you use daily`,
+          `Build in public: Show your real ${niche} process start to finish`
+        ],
+        'livestream': [
+          `Live Q&A: Ask me anything about ${niche}`,
+          `${niche} news/trends breakdown — real-time with chat input`,
+          `Co-work with me: 60 min of focused ${niche} work, chat can ask questions`,
+          `Live ${niche} challenge: Can I [achieve X] in [time] with chat voting on decisions`,
+          `Behind-the-scenes: Show your actual ${niche} workflow live`,
+          `Live podcast recording — submit topics in chat beforehand`,
+          `React to ${niche} content live with commentary (collaboration bait)`
+        ],
+        'written': [
+          `Thread: "I've been in ${niche} for X years. Here are 10 brutal truths..."`,
+          `LinkedIn post: One ${niche} insight that changed everything for you`,
+          `Essay: "The ${niche} playbook I wish someone gave me on day 1"`,
+          `Thread: "Stop doing X in ${niche}. Do this instead."`,
+          `Newsletter: "3 ${niche} trends you missed this week — and why they matter"`,
+          `Case study: How I/we helped [type of client] achieve [result] in ${niche}`,
+          `Hot take: "Unpopular opinion about ${niche} — and the data to back it up"`
+        ],
+        'carousel': [
+          `10 ${niche} lessons I wish I knew sooner (save-worthy checklist)`,
+          `The ${niche} framework: Step-by-step visual breakdown`,
+          `5 common ${niche} mistakes — and exactly how to fix each one`,
+          `LinkedIn: "I spent X years in ${niche}. Here's what actually works."`,
+          `Before/after: ${niche} transformation with your framework`,
+          `Comparison: ${niche} approaches that fail vs. those that scale`,
+          `Data dump: ${niche} statistics that will surprise your network`
+        ],
+        'faceless': [
+          `5 ${niche} myths that hold people back (text + visuals)`,
+          `Data dump: ${niche} statistics that will surprise you`,
+          `Compilation: Best ${niche} tips from top experts this week`,
+          `Quote + commentary: Famous ${niche} person — what they got right/wrong`,
+          `Animated explainer: How ${niche} actually works (whiteboard-style)`,
+          `Curated list: The best free ${niche} resources nobody knows about`,
+          `"Did you know?" ${niche} facts that make people tag their friends`
+        ]
+      };
+
+      const formatPosts = nichePosts[format.platforms[0] === 'TikTok' ? 'short-form' :
+        format.name.includes('Long') ? 'long-form' :
+        format.name.includes('Live') ? 'livestream' :
+        format.name.includes('Written') ? 'written' :
+        format.name.includes('Carousel') ? 'carousel' : 'faceless'] || nichePosts['short-form'];
+
+      return [...posts, ...formatPosts].slice(0, 7);
+    }
+
+    function generateMonetizationPath(format, style, p) {
+      const goal = p.goal || 'authority';
+      const niche = p.niche || 'your industry';
+
+      const paths = {
+        leads: `
+          <div class="result-card">
+            <h3>🎯 Lead Gen Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Week 1-4:</strong> Build authority content (${style.name}) — no selling, pure value</li>
+              <li><strong>Week 4-8:</strong> Introduce soft CTA — "DM me ${niche} guide" or link to lead magnet</li>
+              <li><strong>Week 8-12:</strong> Add case studies showing results — social proof converts</li>
+              <li><strong>Month 3+:</strong> Scale what converts — double down on top-performing post types</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">Conversion benchmark: 1-3% of engaged followers become leads. With 10K engaged followers, that's 100-300 leads/month.</p>
+          </div>
+        `,
+        authority: `
+          <div class="result-card">
+            <h3>🏆 Authority Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Month 1-2:</strong> Consistent ${style.name} content — establish your voice and framework</li>
+              <li><strong>Month 3:</strong> Pitch podcasts, guest posts, speaking gigs using your content as proof</li>
+              <li><strong>Month 4-6:</strong> Build email list (Substack/ConvertKit) — own your audience</li>
+              <li><strong>Month 6+:</strong> Launch premium offer (course, coaching, consulting) to warm audience</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">Authority compounds: 6 months of consistent content = inbound opportunities for life.</p>
+          </div>
+        `,
+        audience: `
+          <div class="result-card">
+            <h3>👥 Audience Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Month 1-3:</strong> Maximum volume + maximum value — ${format.freqRecommended}</li>
+              <li><strong>Month 3-6:</strong> Find your top 3 performing post types — repeat them relentlessly</li>
+              <li><strong>Month 6-9:</strong> Cross-post to 2nd platform — double your reach</li>
+              <li><strong>Month 9+:</strong> Introduce monetization — audience is warm, sell when they ask</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">10K engaged followers = real leverage. 100K = life-changing audience.</p>
+          </div>
+        `,
+        sales: `
+          <div class="result-card">
+            <h3>🛒 Sales Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Week 1-2:</strong> Authority posts — prove you know your stuff</li>
+              <li><strong>Week 3-4:</strong> Social proof posts — client results, testimonials, case studies</li>
+              <li><strong>Week 5-8:</strong> Direct offer posts — pitch your product/service explicitly</li>
+              <li><strong>Ongoing:</strong> 60% value, 30% proof, 10% pitch — the golden ratio for sales content</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">Conversion benchmark: 1-2% of followers buy. Offer quality matters more than audience size.</p>
+          </div>
+        `,
+        'ad-revenue': `
+          <div class="result-card">
+            <h3>📺 Ad Revenue Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Month 1-3:</strong> Hit platform monetization thresholds (YT: 1K subs + 4K watch hrs)</li>
+              <li><strong>Month 3-6:</strong> Optimize for watch time and CPM — longer retention = higher CPM</li>
+              <li><strong>Month 6+:</strong> Diversify — ads + sponsorships + affiliate + products</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">Your ${style.name} format at $${format.avgCPM} CPM = $${format.revenuePer10K} per 10K views. 1M views/mo = $${format.revenuePer10K * 100}/mo from ads alone.</p>
+          </div>
+        `,
+        community: `
+          <div class="result-card">
+            <h3>🤝 Community Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Month 1-2:</strong> Free content that filters for your people — repel the wrong audience</li>
+              <li><strong>Month 3:</strong> Launch free Discord/Telegram — give superfans a home</li>
+              <li><strong>Month 4-6:</strong> Add paid tier (Skool, Circle, Discord role) — $20-50/mo</li>
+              <li><strong>Month 6+:</strong> Events, masterminds, retreats — community is the product</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">500 paying members at $30/mo = $15K/mo. 1000 members = $30K/mo recurring.</p>
+          </div>
+        `,
+        'sell-business': `
+          <div class="result-card">
+            <h3>💼 Build-to-Sell Path</h3>
+            <ol class="space-y-2 text-sm list-decimal list-inside">
+              <li><strong>Month 1-6:</strong> Build audience + email list — asset #1 is the list</li>
+              <li><strong>Month 6-12:</strong> Document your systems — buyer needs to see a real business</li>
+              <li><strong>Year 2:</strong> Add revenue streams (ads, products, services) — multiple income = higher valuation</li>
+              <li><strong>Exit:</strong> Sell on MicroAcquire, Flippa, or private sale — 2-4x annual profit multiple</li>
+            </ol>
+            <p class="text-xs mt-2" style="color:#9ca3af">A content brand with 50K email subscribers and $10K/mo revenue sells for $300K-$1M+.</p>
+          </div>
+        `
+      };
+
+      return paths[goal] || paths.authority;
+    }
+
+    function generateChecklist(format, style, p) {
+      const platform = format.platforms[0];
+      return `
+        <div class="space-y-2 text-sm">
+          <div><span style="color:#4ade80">✓</span> Create/optimize your <strong>${platform}</strong> profile (bio, profile pic, link)</div>
+          <div><span style="color:#4ade80">✓</span> Batch-create 3 posts before posting (test your ${style.name} format)</div>
+          <div><span style="color:#4ade80">✓</span> Post at least ${format.freqRecommended} — consistency beats perfection</div>
+          <div><span style="color:#4ade80">✓</span> Engage with 10 accounts in your niche daily (30 min) — algorithm reward</div>
+          <div><span style="color:#4ade80">✓</span> Track weekly: views, engagement, follows, leads/sales</div>
+          <div><span style="color:#4ade80">✓</span> After 30 days: kill what's not working, double down on what is</div>
+          <div><span style="color:#4ade80">✓</span> After 60 days: add second format (repurpose each post across platforms)</div>
+          <div><span style="color:#4ade80">✓</span> After 90 days: introduce monetization — you've earned the right to sell</div>
+        </div>
+      `;
+    }
+
+    function formatGoal(goal) {
+      const map = {
+        leads: 'lead generation',
+        authority: 'authority building',
+        audience: 'audience growth',
+        sales: 'direct sales',
+        'ad-revenue': 'ad revenue',
+        community: 'community building',
+        'sell-business': 'building to sell'
+      };
+      return map[goal] || goal;
+    }
+
+    function goBack() {
+      if (window.history.length > 1) window.history.back();
+      else window.location.href = '/';
+    }
+
+    function clearForm() {
+      ['userName', 'userNiche', 'userStrengths', 'userExperience'].forEach(id => document.getElementById(id).value = '');
+      ['userPersonality', 'userTime', 'userEquipment', 'userGoal'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('resultSection').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

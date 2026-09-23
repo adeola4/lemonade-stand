@@ -1,0 +1,24 @@
+{
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "deals.html", "use": "@vercel/static" },
+    { "src": "qla.html", "use": "@vercel/static" },
+    { "src": "loop-master.html", "use": "@vercel/static" },
+    { "src": "missions.html", "use": "@vercel/static" },
+    { "src": "links.html", "use": "@vercel/static" },
+    { "src": "brain.html", "use": "@vercel/static" },
+    { "src": "docs.html", "use": "@vercel/static" },
+    { "src": "content-advisor.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/deals.html", "dest": "/deals.html" },
+    { "src": "/qla.html", "dest": "/qla.html" },
+    { "src": "/loop-master.html", "dest": "/loop-master.html" },
+    { "src": "/missions.html", "dest": "/missions.html" },
+    { "src": "/links.html", "dest": "/links.html" },
+    { "src": "/brain.html", "dest": "/brain.html" },
+    { "src": "/docs.html", "dest": "/docs.html" },
+    { "src": "/content-advisor.html", "dest": "/content-advisor.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
