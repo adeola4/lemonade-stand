@@ -86,6 +86,44 @@
   </nav>
 
   <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+
+    <!-- README Panel for New Users -->
+    <div class="panel p-6 mb-6" style="border-color: #fbbf24;">
+      <div class="panel-header flex items-center gap-2">
+        <span class="status-dot active"></span>
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">🍋 Lemonade Stand — Quick Start</h2>
+        <button class="btn btn-ghost ml-auto" onclick="document.getElementById('readme-panel').style.display='none'">✕ Close</button>
+      </div>
+      <div id="readme-panel" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div>
+          <h3 class="font-bold mb-2" style="color: #fde68a">What is this?</h3>
+          <p class="text-xs leading-relaxed" style="color: #9ca3af">
+            Autonomous business command center. QLA methodology (2,979 Peña action items) + AI agent = deal sourcing, loop automation, mission control. Talk to the agent in Discord — it operates everything here.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-bold mb-2" style="color: #fde68a">Pages</h3>
+          <ul class="text-xs space-y-1" style="color: #9ca3af">
+            <li><strong style="color: #f3f4f6">Dashboard</strong> — live metrics, mission feed</li>
+            <li><strong style="color: #f3f4f6">Deals</strong> — deal generation pipeline</li>
+            <li><strong style="color: #f3f4f6">QLA Bot</strong> — deal automation scaffolding</li>
+            <li><strong style="color: #f3f4f6">Loop Master</strong> — create, run, improve loops</li>
+            <li><strong style="color: #f3f4f6">Missions</strong> — task management + acceptance</li>
+            <li><strong style="color: #f3f4f6">Brain</strong> — AI knowledge base</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-bold mb-2" style="color: #fde68a">How to use</h3>
+          <ul class="text-xs space-y-1" style="color: #9ca3af">
+            <li>• <strong style="color: #f3f4f6">Discord:</strong> Talk to the agent — it builds loops, generates deals, manages missions</li>
+            <li>• <strong style="color: #f3f4f6">Loop Master:</strong> Paste any document → AI creates a self-improving loop</li>
+            <li>• <strong style="color: #f3f4f6">Missions:</strong> Add tasks, assign ranks, track acceptance + progress</li>
+            <li>• <strong style="color: #f3f4f6">Voice:</strong> Join a VC, say "hey hermes" to start talking</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold">Command Center</h1>
