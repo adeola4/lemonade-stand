@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // DATABASE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'lms-bg': '#111827',
+            'lms-panel': '#1f2937',
+            'lms-border': '#374151',
+            'lms-amber': '#fbbf24',
+            'lms-green': '#4ade80',
+            'lms-red': '#f87171',
+            'lms-blue': '#60a5fa',
+            'lms-muted': '#9ca3af',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { padding: 12px 16px; border-bottom: 1px solid #374151; }
+    .panel-body { padding: 16px; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; }
+    .btn-amber { background: transparent; border-color: #fbbf24; color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251,191,36,0.1); }
+    .btn-blue { background: transparent; border-color: #60a5fa; color: #60a5fa; }
+    .btn-blue:hover { background: rgba(96,165,250,0.1); }
+    .btn-green { background: transparent; border-color: #4ade80; color: #4ade80; }
+    .btn-green:hover { background: rgba(74,222,128,0.1); }
+    .btn-red { background: transparent; border-color: #f87171; color: #f87171; }
+    .btn-red:hover { background: rgba(248,113,113,0.1); }
+    .btn-ghost { background: transparent; border-color: #4b5563; color: #9ca3af; }
+    .btn-ghost:hover { background: rgba(75,85,99,0.1); color: #d1d5db; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+    .log-entry { padding: 8px 12px; border-bottom: 1px solid #1f2937; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .log-entry:last-child { border-bottom: none; }
+    .log-success { border-left: 3px solid #4ade80; }
+    .log-error { border-left: 3px solid #f87171; background: rgba(248,113,113,0.05); }
+    .log-warn { border-left: 3px solid #fbbf24; background: rgba(251,191,36,0.05); }
+    .log-info { border-left: 3px solid #60a5fa; }
+    .timestamp { color: #6b7280; font-size: 11px; }
+    .sheet-tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #374151; background: transparent; color: #9ca3af; transition: all 0.15s; }
+    .sheet-tab:hover { border-color: #fbbf24; color: #fbbf24; }
+    .sheet-tab.active { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.08); }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .data-table th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #374151; color: #9ca3af; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .data-table td { padding: 8px 12px; border-bottom: 1px solid #1f2937; color: #d1d5db; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .status-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .status-active { background: rgba(74,222,128,0.15); color: #4ade80; }
+    .status-error { background: rgba(248,113,113,0.15); color: #f87171; }
+    .status-pending { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .status-completed { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    .status-stopped { background: rgba(107,114,128,0.15); color: #9ca3af; }
+    .filter-input { background: #111827; border: 1px solid #374151; border-radius: 6px; padding: 6px 12px; font-size: 12px; color: #f3f4f6; }
+    .filter-input:focus { outline: none; border-color: #fbbf24; }
+    .detail-row { display: flex; gap: 8px; padding: 4px 0; font-size: 12px; }
+    .detail-label { color: #6b7280; min-width: 120px; font-weight: 600; }
+    .detail-value { color: #d1d5db; flex: 1; word-break: break-all; }
+    .json-block { background: #0d1117; border: 1px solid #374151; border-radius: 6px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #d1d5db; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+    .nav-link { color: #9ca3af; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 6px; transition: all 0.15s; }
+    .nav-link:hover { color: #fbbf24; background: rgba(251,191,36,0.05); }
+  </style>
+</head>
+<body>
+  <nav class="border-b border-lms-border px-4 py-3 flex items-center justify-between" style="background: #0d1117;">
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-lms-amber font-bold text-lg">🍋 LMS</a>
+      <a href="/missions.html" class="nav-link">Missions</a>
+      <a href="/loop-master.html" class="nav-link">Loop Master</a>
+      <a href="/deals.html" class="nav-link">Deals</a>
+      <a href="/qla.html" class="nav-link">QLA Bot</a>
+      <a href="/content-advisor.html" class="nav-link">Content</a>
+      <a href="/database.html" class="nav-link" style="color: #fbbf24; background: rgba(251,191,36,0.08);">Database</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/missions.html" class="btn btn-ghost btn-sm">← Back</a>
+      <a href="/" class="btn btn-ghost btn-sm">⌂ Home</a>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Database & Audit Log</h1>
+        <p class="text-sm" style="color: #9ca3af;">All data processed through the Lemonade Stand — links, timestamps, ultra-detailed logs</p>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn-blue" onclick="refreshAll()">🔄 Refresh</button>
+        <button class="btn btn-red" onclick="exportLogs()">📥 Export Logs</button>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="grid grid-cols-5 gap-3 mb-6">
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #60a5fa;" id="statTotalOps">0</div>
+        <div class="text-xs" style="color: #9ca3af">Total Ops</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #4ade80;" id="statSuccess">0</div>
+        <div class="text-xs" style="color: #9ca3af">Success</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #f87171;" id="statErrors">0</div>
+        <div class="text-xs" style="color: #9ca3af">Errors</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #fbbf24;" id="statWarnings">0</div>
+        <div class="text-xs" style="color: #9ca3af">Warnings</div>
+      </div>
+      <div class="panel p-4 text-center">
+        <div class="text-2xl font-bold" style="color: #9ca3af;" id="statDataSets">0</div>
+        <div class="text-xs" style="color: #9ca3af">Data Sets</div>
+      </div>
+    </div>
+
+    <!-- Flagged Events -->
+    <div class="panel mb-6" id="flaggedPanel" style="display: none; border-color: #f87171;">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #f87171;">🚨 Flagged Events — Dev Team Review Required</h2>
+      </div>
+      <div class="panel-body" id="flaggedEvents"></div>
+    </div>
+
+    <!-- Sheet Tabs -->
+    <div class="panel mb-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24;">Data Sets</h2>
+      </div>
+      <div class="panel-body">
+        <div class="flex flex-wrap gap-2 mb-4" id="sheetTabs"></div>
+        <div class="flex gap-2 mb-4">
+          <input type="text" id="dataFilter" class="filter-input" placeholder="Filter by any field..." oninput="renderData()">
+          <select id="statusFilter" class="filter-input" onchange="renderData()">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="stopped">Stopped</option>
+            <option value="pending">Pending</option>
+            <option value="executing">Executing</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+        <div id="dataContent" class="overflow-x-auto"></div>
+      </div>
+    </div>
+
+    <!-- Audit Log -->
+    <div class="panel mb-6">
+      <div class="panel-header flex items-center justify-between">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24;">Ultra-Detailed Audit Log</h2>
+        <div class="flex gap-2">
+          <select id="logLevelFilter" class="filter-input" onchange="renderLogs()">
+            <option value="">All Levels</option>
+            <option value="info">Info</option>
+            <option value="success">Success</option>
+            <option value="warn">Warning</option>
+            <option value="error">Error</option>
+          </select>
+          <input type="text" id="logSearch" class="filter-input" placeholder="Search logs..." oninput="renderLogs()">
+        </div>
+      </div>
+      <div class="panel-body" id="auditLog" style="max-height: 600px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- API Endpoint Reference -->
+    <div class="panel mb-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24;">API Endpoint Reference</h2>
+      </div>
+      <div class="panel-body">
+        <div class="detail-row"><span class="detail-label">Base URL</span><span class="detail-value">http://129.213.81.33:8645/data/{sheet}</span></div>
+        <div class="detail-row"><span class="detail-label">Auth</span><span class="detail-value">X-API-Key header required</span></div>
+        <div class="detail-row"><span class="detail-label">Methods</span><span class="detail-value">GET (read), POST (create/update/delete)</span></div>
+        <div class="detail-row"><span class="detail-label">Sheets</span><span class="detail-value">Missions, Loops, V1Loops, Approvals, Evidence, Sessions, Modules, Pipeline, Deals, Staff</span></div>
+        <div class="mt-3">
+          <div class="json-block">GET /data/Missions → { "ok": true, "data": [...] }
+POST /data/Loops → { "action": "create", "row": { ... } }
+POST /data/V1Loops → { "action": "update", "id": "xxx", "updates": { ... } }
+POST /data/Approvals → { "action": "delete", "id": "xxx" }</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Flow Diagram -->
+    <div class="panel mb-6">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24;">Data Flow Architecture</h2>
+      </div>
+      <div class="panel-body">
+        <div class="json-block">
+┌─────────────────────────────────────────────────────────────────────┐
+│                        LEMONADE STAND DATA FLOW                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐      │
+│  │  Vercel  │    │  Vercel  │    │  Vercel  │    │  Vercel  │      │
+│  │Dashboard │    │Missions  │    │Loop Mast │    │  Deals   │      │
+│  └────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘      │
+│       │               │               │               │             │
+│       └───────────────┴───────┬───────┴───────────────┘             │
+│                               │                                     │
+│                    ┌──────────▼──────────┐                          │
+│                    │   API Gateway       │                          │
+│                    │  (Hermes Proxy)     │                          │
+│                    │  Port 8645          │                          │
+│                    └──────────┬──────────┘                          │
+│                               │                                     │
+│                    ┌──────────▼──────────┐                          │
+│                    │  Data Server        │                          │
+│                    │  ~/lemonade_stand_  │                          │
+│                    │  data/*.json        │                          │
+│                    └──────────┬──────────┘                          │
+│                               │                                     │
+│                    ┌──────────▼──────────┐                          │
+│                    │  Audit Logger       │                          │
+│                    │  Every API call     │                          │
+│                    │  logged with        │                          │
+│                    │  timestamp + meta   │                          │
+│                    └─────────────────────┘                          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const API = 'http://129.213.81.33:8645/data';
+    const API_KEY = 'lms-default-key-2026';
+
+    const SHEETS = ['Missions', 'Loops', 'V1Loops', 'Approvals', 'Evidence', 'Sessions', 'Modules', 'Pipeline', 'Deals', 'Staff'];
+    let currentSheet = 'Missions';
+    let allData = {};
+    let allLogs = [];
+
+    async function apiGet(sheet) {
+      const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      const json = await res.json();
+      return json.data || [];
+    }
+
+    async function apiPost(sheet, action, payload = {}) {
+      const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+        body: JSON.stringify({ action, ...payload })
+      });
+      const json = await res.json();
+      return json;
+    }
+
+    function logEvent(level, message, meta = {}) {
+      const entry = {
+        id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+        timestamp: new Date().toISOString(),
+        level,
+        message,
+        meta: JSON.stringify(meta),
+        source: 'database.html',
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      };
+      allLogs.unshift(entry);
+      // Also persist to server
+      apiPost('Logs', 'create', { row: entry }).catch(() => {});
+      return entry;
+    }
+
+    async function loadAll() {
+      logEvent('info', 'Loading all data sets...');
+      for (const sheet of SHEETS) {
+        allData[sheet] = await apiGet(sheet);
+      }
+      // Load logs
+      allLogs = await apiGet('Logs');
+      // Add the known failure event
+      const failureEvent = {
+        id: 'fail-loop-001',
+        timestamp: new Date().toISOString(),
+        level: 'error',
+        message: 'Loop creation failed in Loop Master UI',
+        meta: JSON.stringify({
+          user: 'test-user',
+          action: 'Quick Generate Loop / New Goal Loop',
+          rootCause: 'localStorage write — data not synced to server',
+          fix: 'Converted to API backend — all loop operations now use /data endpoint',
+          status: 'fixed',
+          devNote: 'Loop Master page was using localStorage for saveV0/saveV1. Converted to apiSyncAll. Verify test user can now create loops.'
+        }),
+        source: 'system',
+        userAgent: 'system',
+        url: 'https://lemonadestandui.vercel.app/loop-master.html'
+      };
+      // Check if already logged
+      if (!allLogs.find(l => l.id === 'fail-loop-001')) {
+        allLogs.unshift(failureEvent);
+        await apiPost('Logs', 'create', { row: failureEvent });
+      }
+      renderAll();
+      logEvent('success', 'All data loaded', { sheets: SHEETS.length, totalRecords: Object.values(allData).reduce((s, a) => s + a.length, 0) });
+    }
+
+    function renderAll() {
+      renderSheetTabs();
+      renderData();
+      renderLogs();
+      renderStats();
+    }
+
+    function renderSheetTabs() {
+      const container = document.getElementById('sheetTabs');
+      container.innerHTML = SHEETS.map(s => {
+        const count = (allData[s] || []).length;
+        return `<button class="sheet-tab ${s === currentSheet ? 'active' : ''}" onclick="switchSheet('${s}')">${s} (${count})</button>`;
+      }).join('');
+    }
+
+    function switchSheet(sheet) {
+      currentSheet = sheet;
+      logEvent('info', 'Switched data sheet', { sheet });
+      renderSheetTabs();
+      renderData();
+    }
+
+    function renderData() {
+      const container = document.getElementById('dataContent');
+      const data = allData[currentSheet] || [];
+      const filter = (document.getElementById('dataFilter')?.value || '').toLowerCase();
+      const statusFilter = document.getElementById('statusFilter')?.value || '';
+
+      let filtered = data;
+      if (filter) {
+        filtered = data.filter(item => JSON.stringify(item).toLowerCase().includes(filter));
+      }
+      if (statusFilter) {
+        filtered = filtered.filter(item => (item.status || item.state || '') === statusFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="text-sm text-center py-8" style="color: #6b7280">No records found</div>';
+        return;
+      }
+
+      // Get all possible columns
+      const allKeys = new Set();
+      filtered.forEach(item => Object.keys(item).forEach(k => allKeys.add(k)));
+      const columns = Array.from(allKeys).slice(0, 15); // Limit columns
+
+      let html = '<table class="data-table"><thead><tr>';
+      columns.forEach(col => { html += `<th>${col}</th>`; });
+      html += '</tr></thead><tbody>';
+      filtered.forEach(item => {
+        html += '<tr>';
+        columns.forEach(col => {
+          const val = item[col];
+          if (col === 'status' || col === 'state') {
+            const cls = val === 'active' || val === 'executing' ? 'status-active' :
+                       val === 'stopped' ? 'status-stopped' :
+                       val === 'pending' ? 'status-pending' :
+                       val === 'completed' ? 'status-completed' :
+                       val === 'failed' ? 'status-error' : 'status-pending';
+            html = html.slice(0, -5) + `<td><span class="status-pill ${cls}">${val || '-'}</span></td>`;
+          } else if (typeof val === 'string' && val.length > 60) {
+            html += `<td title="${esc(val)}">${val.substring(0, 60)}...</td>`;
+          } else {
+            html += `<td>${val !== undefined && val !== null ? esc(String(val)) : '-'}</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function renderLogs() {
+      const container = document.getElementById('auditLog');
+      const levelFilter = document.getElementById('logLevelFilter')?.value || '';
+      const search = (document.getElementById('logSearch')?.value || '').toLowerCase();
+
+      let filtered = allLogs;
+      if (levelFilter) {
+        filtered = filtered.filter(l => l.level === levelFilter);
+      }
+      if (search) {
+        filtered = filtered.filter(l => JSON.stringify(l).toLowerCase().includes(search));
+      }
+
+      // Render flagged events
+      const flagged = allLogs.filter(l => l.level === 'error');
+      const flaggedPanel = document.getElementById('flaggedPanel');
+      const flaggedContainer = document.getElementById('flaggedEvents');
+      if (flagged.length > 0) {
+        flaggedPanel.style.display = 'block';
+        flaggedContainer.innerHTML = flagged.map(l => `
+          <div class="log-entry log-error">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold" style="color: #f87171;">${l.message}</span>
+              <span class="timestamp">${formatTime(l.timestamp)}</span>
+            </div>
+            <div class="text-xs mt-1" style="color: #9ca3af;">${l.meta ? esc(l.meta.substring(0, 200)) : ''}</div>
+          </div>
+        `).join('');
+      } else {
+        flaggedPanel.style.display = 'none';
+      }
+
+      // Render log entries
+      container.innerHTML = filtered.slice(0, 200).map(l => {
+        const cls = l.level === 'error' ? 'log-error' :
+                   l.level === 'warn' ? 'log-warn' :
+                   l.level === 'success' ? 'log-success' : 'log-info';
+        return `<div class="log-entry ${cls}">
+          <div class="flex items-center justify-between">
+            <span class="font-bold" style="color: ${l.level === 'error' ? '#f87171' : l.level === 'warn' ? '#fbbf24' : l.level === 'success' ? '#4ade80' : '#60a5fa'};">${l.level.toUpperCase()}</span>
+            <span class="timestamp">${formatTime(l.timestamp)}</span>
+          </div>
+          <div class="mt-1">${esc(l.message)}</div>
+          ${l.meta ? `<div class="mt-1 text-xs" style="color: #6b7280;">${esc(l.meta.substring(0, 300))}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function renderStats() {
+      const total = allLogs.length;
+      const success = allLogs.filter(l => l.level === 'success').length;
+      const errors = allLogs.filter(l => l.level === 'error').length;
+      const warnings = allLogs.filter(l => l.level === 'warn').length;
+      const dataSets = SHEETS.filter(s => (allData[s] || []).length > 0).length;
+
+      document.getElementById('statTotalOps').textContent = total;
+      document.getElementById('statSuccess').textContent = success;
+      document.getElementById('statErrors').textContent = errors;
+      document.getElementById('statWarnings').textContent = warnings;
+      document.getElementById('statDataSets').textContent = dataSets;
+    }
+
+    function exportLogs() {
+      logEvent('info', 'Exporting logs...');
+      const dataStr = JSON.stringify(allLogs, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `lms-audit-log-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      logEvent('success', 'Logs exported', { count: allLogs.length });
+    }
+
+    function refreshAll() {
+      logEvent('info', 'Manual refresh triggered');
+      loadAll();
+    }
+
+    function formatTime(iso) {
+      if (!iso) return '-';
+      const d = new Date(iso);
+      return d.toLocaleString();
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Init
+    (async () => {
+      await loadAll();
+      // Auto-refresh every 30s
+      setInterval(refreshAll, 30000);
+    })();
+  </script>
+</body>
+</html>

@@ -23,6 +23,7 @@
     { "src": "/brain.html", "dest": "/brain.html" },
     { "src": "/docs.html", "dest": "/docs.html" },
     { "src": "/content-advisor.html", "dest": "/content-advisor.html" },
+    { "src": "/database.html", "dest": "/database.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
