@@ -446,15 +446,38 @@
     let stateFilter = 'all';
     let moduleFilter = 'all';
 
-    // === STORAGE KEYS ===
-    const KEYS = {
-      v0: 'qla_loops',
-      v1: 'qla_v1_loops',
-      approvals: 'qla_approvals',
-      evidence: 'qla_evidence',
-      sessions: 'qla_sessions',
-      modules: ['qla_module_adaptive','qla_module_deps','qla_module_notify','qla_module_heal','qla_module_metrics','qla_module_templates','qla_module_scheduler','qla_module_resources']
-    };
+    // === API Backend ===
+    const API = 'http://129.213.81.33:8645/data';
+    const API_KEY = 'lms-default-key-2026';
+
+    async function apiGet(sheet) {
+      const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      const json = await res.json();
+      return json.data || [];
+    }
+
+    async function apiPost(sheet, action, payload = {}) {
+      const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+        body: JSON.stringify({ action, ...payload })
+      });
+      const json = await res.json();
+      return json;
+    }
+
+    async function apiSyncAll(sheet, data) {
+      // Sync entire array: delete all then re-create (simple + deterministic)
+      const existing = await apiGet(sheet);
+      for (const item of existing) {
+        if (item.id) await apiPost(sheet, 'delete', { id: item.id });
+      }
+      for (const item of data) {
+        await apiPost(sheet, 'create', { row: item });
+      }
+    }
 
     const MODULE_NAMES = {
       adaptive: 'Adaptive Interval',
@@ -471,31 +494,31 @@
     const STATE_LABELS = {pending:'Pending',planning:'Planning',executing:'Executing',verifying:'Verifying',completed:'Completed'};
 
     // === DATA LOADING ===
-    function loadAll() {
-      try { v0Loops = JSON.parse(localStorage.getItem(KEYS.v0) || '[]'); } catch(e) { v0Loops = []; }
-      try { v1Loops = JSON.parse(localStorage.getItem(KEYS.v1) || '[]'); } catch(e) { v1Loops = []; }
-      try { approvals = JSON.parse(localStorage.getItem(KEYS.approvals) || '[]'); } catch(e) { approvals = []; }
-      try { evidence = JSON.parse(localStorage.getItem(KEYS.evidence) || '[]'); } catch(e) { evidence = []; }
-      try { sessions = JSON.parse(localStorage.getItem(KEYS.sessions) || '[]'); } catch(e) { sessions = []; }
-
-      // Load module states
+    async function loadAll() {
+      v0Loops = await apiGet('Loops');
+      v1Loops = await apiGet('V1Loops');
+      approvals = await apiGet('Approvals');
+      evidence = await apiGet('Evidence');
+      sessions = await apiGet('Sessions');
+      modules = await apiGet('Modules');
+      if (!modules || typeof modules !== 'object') {
+        modules = {};
+      }
+      // Ensure all module keys exist
       const modKeys = ['adaptive','deps','notify','heal','metrics','templates','scheduler','resources'];
       modKeys.forEach(k => {
-        try {
-          const data = JSON.parse(localStorage.getItem('qla_module_' + k) || 'null');
-          modules[k] = data || {name:k,status:'inactive',last_activity:null,runs:0,errors:0};
-        } catch(e) {
+        if (!modules[k]) {
           modules[k] = {name:k,status:'inactive',last_activity:null,runs:0,errors:0};
         }
       });
     }
 
-    function saveV0() { localStorage.setItem(KEYS.v0, JSON.stringify(v0Loops)); }
-    function saveV1() { localStorage.setItem(KEYS.v1, JSON.stringify(v1Loops)); }
-    function saveApprovals() { localStorage.setItem(KEYS.approvals, JSON.stringify(approvals)); }
-    function saveEvidence() { localStorage.setItem(KEYS.evidence, JSON.stringify(evidence)); }
-    function saveSessions() { localStorage.setItem(KEYS.sessions, JSON.stringify(sessions)); }
-    function saveModule(key) { localStorage.setItem('qla_module_' + key, JSON.stringify(modules[key])); }
+    async function saveV0() { await apiSyncAll('Loops', v0Loops); }
+    async function saveV1() { await apiSyncAll('V1Loops', v1Loops); }
+    async function saveApprovals() { await apiSyncAll('Approvals', approvals); }
+    async function saveEvidence() { await apiSyncAll('Evidence', evidence); }
+    async function saveSessions() { await apiSyncAll('Sessions', sessions); }
+    async function saveModule(key) { await apiPost('Modules', 'create', { row: modules[key] }); }
 
     // === RENDERING ===
     function renderAll() {
@@ -712,7 +735,7 @@
     }
 
     // === ACTIONS ===
-    function refreshAll() { loadAll(); renderAll(); }
+    async function refreshAll() { await loadAll(); renderAll(); }
 
     function filterByState(state, btn) {
       stateFilter = state;
@@ -734,7 +757,7 @@
     }
     function closeV1CreateModal() { document.getElementById('v1-create-modal').classList.remove('active'); }
 
-    function saveV1Loop(event) {
+    async function saveV1Loop(event) {
       event.preventDefault();
       const selectedModules = Array.from(document.getElementById('v1-modules').selectedOptions).map(o => o.value);
       const loop = {
@@ -754,12 +777,12 @@
         updated_at: new Date().toISOString()
       };
       v1Loops.push(loop);
-      saveV1();
+      await saveV1();
       renderAll();
       closeV1CreateModal();
     }
 
-    function controlV1Loop(id, action) {
+    async function controlV1Loop(id, action) {
       const loop = v1Loops.find(l => l.id === id);
       if (!loop) return;
       if (action === 'start') loop.state = 'executing';
@@ -769,7 +792,7 @@
       else if (action === 'complete') loop.state = 'completed';
       else if (action === 'restart') { loop.state = 'executing'; loop.iterations_used = 0; loop.tokens_spent = 0; }
       loop.updated_at = new Date().toISOString();
-      saveV1();
+      await saveV1();
       renderAll();
     }
 
@@ -785,10 +808,10 @@
       document.getElementById('v1-priority').value = loop.priority || 2;
     }
 
-    function deleteV1Loop(id) {
+    async function deleteV1Loop(id) {
       if (!confirm('Permanently delete this goal loop?')) return;
       v1Loops = v1Loops.filter(l => l.id !== id);
-      saveV1();
+      await saveV1();
       renderAll();
     }
 
@@ -814,7 +837,7 @@
     }
     function closePromptModal() { document.getElementById('prompt-modal').classList.remove('active'); }
 
-    function generateFromPrompt() {
+    async function generateFromPrompt() {
       const prompt = document.getElementById('prompt-input').value.trim();
       const company = document.getElementById('prompt-company').value.trim() || 'tan';
       if (!prompt) { alert('Please describe the loop'); return; }
@@ -845,7 +868,7 @@
         created_at: new Date().toISOString()
       };
       v0Loops.push(loop);
-      saveV0();
+      await saveV0();
       renderAll();
       closePromptModal();
     }
@@ -875,9 +898,11 @@
     }
 
     // === INIT ===
-    loadAll();
-    renderAll();
-    setInterval(refreshAll, 30000);
+    (async () => {
+      await loadAll();
+      renderAll();
+      setInterval(refreshAll, 30000);
+    })();
   
     function goBack() {
         if (window.history.length > 1) {

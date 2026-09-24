@@ -1,19 +1,22 @@
 // Dashboard page logic — Mission Control theme
 // ALL data fetched from /api/data (Google Sheets backend) — no localStorage
 
-const API = '/api/data';
+const API = 'http://129.213.81.33:8645/data';
+const API_KEY = 'lms-default-key-2026';
 
 async function apiGet(sheet) {
-  const res = await fetch(`${API}?sheet=${encodeURIComponent(sheet)}`);
+  const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
+    headers: { 'X-API-Key': API_KEY }
+  });
   const json = await res.json();
   return json.data || [];
 }
 
 async function apiPost(sheet, action, payload = {}) {
-  const res = await fetch(API, {
+  const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sheet, action, ...payload })
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+    body: JSON.stringify({ action, ...payload })
   });
   const json = await res.json();
   return json;
