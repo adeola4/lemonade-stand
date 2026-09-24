@@ -1,5 +1,6 @@
 {
   "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
     { "src": "index.html", "use": "@vercel/static" },
     { "src": "deals.html", "use": "@vercel/static" },
     { "src": "qla.html", "use": "@vercel/static" },
@@ -12,6 +13,7 @@
     { "src": "assets/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/api/data", "dest": "/api/data.js" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/deals.html", "dest": "/deals.html" },
     { "src": "/qla.html", "dest": "/qla.html" },

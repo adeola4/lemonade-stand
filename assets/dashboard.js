@@ -1,29 +1,48 @@
 // Dashboard page logic — Mission Control theme
-// All metrics computed LIVE from localStorage (qla_missions, qla_loops, qla_v1_loops, qla_pipeline_data)
+// ALL data fetched from /api/data (Google Sheets backend) — no localStorage
+
+const API = '/api/data';
+
+async function apiGet(sheet) {
+  const res = await fetch(`${API}?sheet=${encodeURIComponent(sheet)}`);
+  const json = await res.json();
+  return json.data || [];
+}
+
+async function apiPost(sheet, action, payload = {}) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sheet, action, ...payload })
+  });
+  const json = await res.json();
+  return json;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // Quick mission add
   const qm = document.getElementById('quickMissionInput');
   if (qm) {
-    qm.addEventListener('keypress', (e) => {
+    qm.addEventListener('keypress', async (e) => {
       if (e.key === 'Enter' && qm.value.trim()) {
-        const missions = JSON.parse(localStorage.getItem('qla_missions') || '[]');
-        missions.push({
-          id: 'm-' + Date.now().toString(36),
-          title: qm.value.trim(),
-          description: '',
-          rank: 'B',
-          progress: null,
-          acceptance: null,
-          status: 'active',
-          company: '',
-          pct_complete: 0,
-          blockers: '',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          source: 'web'
+        await apiPost('Missions', 'create', {
+          row: {
+            id: 'm-' + Date.now().toString(36),
+            name: qm.value.trim(),
+            rank: 'B',
+            description: '',
+            company: '',
+            assigned_to: '',
+            status: 'active',
+            acceptance: 'pending',
+            progress: 'not_started',
+            notes: '',
+            edits: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            source: 'web'
+          }
         });
-        localStorage.setItem('qla_missions', JSON.stringify(missions));
         qm.value = '';
         renderDashboardMissions();
         renderDashboardMetrics();
@@ -32,35 +51,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   renderDashboardMissions();
   renderDashboardMetrics();
-  // Keep metrics live — recompute every 30s and when storage changes (other tab / page)
+  // Keep metrics live — recompute every 30s
   setInterval(renderDashboardMetrics, 30000);
-  window.addEventListener('storage', renderDashboardMetrics);
 });
 
 // ===== LIVE METRICS =====
-function getMissions() {
-  try { return JSON.parse(localStorage.getItem('qla_missions') || '[]'); } catch(e) { return []; }
-}
-function getV0Loops() {
-  try { return JSON.parse(localStorage.getItem('qla_loops') || '[]'); } catch(e) { return []; }
-}
-function getV1Loops() {
-  try { return JSON.parse(localStorage.getItem('qla_v1_loops') || '[]'); } catch(e) { return []; }
-}
-function getPipeline() {
-  try { return JSON.parse(localStorage.getItem('qla_pipeline_data') || '[]'); } catch(e) { return []; }
-}
+async function getMissions() { return apiGet('Missions'); }
+async function getV0Loops() { return apiGet('Loops'); }
+async function getV1Loops() { return apiGet('V1Loops'); }
+async function getPipeline() { return apiGet('Pipeline'); }
 
-function renderDashboardMetrics() {
+async function renderDashboardMetrics() {
   // --- Missions stat pill ---
-  const missions = getMissions();
+  const missions = await getMissions();
   const activeMissions = missions.filter(m => m.status === 'active');
   const missionsEl = document.getElementById('statMissions');
   if (missionsEl) missionsEl.textContent = activeMissions.length + ' Missions';
 
   // --- Loops stat pill (V0 running + V1 executing/running) ---
-  const v0 = getV0Loops();
-  const v1 = getV1Loops();
+  const v0 = await getV0Loops();
+  const v1 = await getV1Loops();
   const runningLoops =
     v0.filter(l => l.status === 'running').length +
     v1.filter(l => l.state === 'running' || l.state === 'executing').length;
@@ -68,7 +78,7 @@ function renderDashboardMetrics() {
   if (loopsEl) loopsEl.textContent = runningLoops + ' Loops';
 
   // --- Deals stat pill (from pipeline data) ---
-  const pipeline = getPipeline();
+  const pipeline = await getPipeline();
   let dealCount = 0;
   pipeline.forEach(c => { dealCount += (c.deals || []).length; });
   const dealsEl = document.getElementById('statDeals');
@@ -92,7 +102,6 @@ function renderDashboardMetrics() {
   }
 
   // --- Pipeline panel (Sourced / Approaching / Closing) ---
-  // Stages: sourced -> approaching -> negotiation/loi -> closing -> completed
   const stageOf = d => d.stage || d.status || 'sourced';
   let sourced = 0, approaching = 0, closing = 0;
   pipeline.forEach(c => {
@@ -102,7 +111,7 @@ function renderDashboardMetrics() {
       if (['sourced', 'identified', 'scanning'].includes(s)) sourced++;
       else if (['approaching', 'contacted', 'outreach', 'negotiation', 'loi'].includes(s)) approaching++;
       else if (['closing', 'due_diligence', 'signing', 'final'].includes(s)) closing++;
-      else sourced++; // unknown active stage counts as sourced
+      else sourced++;
     });
   });
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -111,8 +120,8 @@ function renderDashboardMetrics() {
   set('pipeClosing', closing);
 }
 
-function renderDashboardMissions() {
-  const missions = getMissions();
+async function renderDashboardMissions() {
+  const missions = await getMissions();
   const el = document.getElementById('dashboardMissions');
   const active = missions.filter(m => m.status === 'active').slice(0, 5);
   if (!active.length) {
@@ -120,17 +129,16 @@ function renderDashboardMissions() {
     return;
   }
   el.innerHTML = active.map(m => {
-    // Support both field sets: new missions use rank (S/A/B/C/D), old data used priority
     const priority = m.priority || { S: 'critical', A: 'critical', B: 'standard', C: 'routine', D: 'routine' }[m.rank] || 'standard';
     const pColor = { critical: 'text-lms-red', standard: 'text-lms-amber', routine: 'text-lms-green' }[priority] || 'text-lms-muted';
     const pLabel = priority === 'critical' ? '!' : priority === 'routine' ? '•' : '>';
     const editCount = m.edits ? `<span class="font-mono" style="color:#4b5563;font-size:10px">✎${m.edits}</span>` : '';
     const noteAlert = (m.notes || []).filter(n => !n.acknowledged).length > 0
       ? `<span style="color:#fbbf24;font-size:10px">🔔</span>` : '';
-    const progressDot = m.progress === 'in-progress' ? '🟡' : m.progress === 'complete' ? '🟢' : m.acceptance === 'declined' ? '🔴' : m.acceptance === 'accepted' ? '⚪' : '🔵';
+    const progressDot = m.progress === 'in_progress' ? '🟡' : m.progress === 'complete' ? '🟢' : m.acceptance === 'declined' ? '🔴' : m.acceptance === 'accepted' ? '⚪' : '🔵';
     return `<div class="mission-item priority-${priority} px-2 py-1.5 rounded flex items-center justify-between gap-2">
       <span class="${pColor} font-mono font-bold text-sm font-medium w-3">${pLabel}</span>
-      <span class="text-xs font-medium truncate flex-1">${m.title}</span>
+      <span class="text-xs font-medium truncate flex-1">${m.name || m.title}</span>
       ${noteAlert}
       ${editCount}
       <span class="text-xs">${progressDot}</span>
