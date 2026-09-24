@@ -50,8 +50,8 @@
     .accept-timer { font-family: 'Courier New', monospace; font-size: 12px; color: #60a5fa; font-weight: 600; }
     .progress-btn { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #374151; background: transparent; color: #9ca3af; transition: all 0.2s; font-family: 'Inter', system-ui, sans-serif; }
     .progress-btn:hover { border-color: #9ca3af; }
-    .progress-btn.active-not-started { border-color: #6b7280; background: rgba(107,114,128,0.15); color: #d1d5db; }
-    .progress-btn.active-in-progress { border-color: #fbbf24; background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .progress-btn.active-not_started { border-color: #6b7280; background: rgba(107,114,128,0.15); color: #d1d5db; }
+    .progress-btn.active-in_progress { border-color: #fbbf24; background: rgba(251,191,36,0.15); color: #fbbf24; }
     .progress-btn.active-complete { border-color: #4ade80; background: rgba(74,222,128,0.15); color: #4ade80; }
     .note-alert { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: #78350f; color: #fbbf24; border: 1px solid #f59e0b; animation: notePulse 2s infinite; cursor: pointer; }
     @keyframes notePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
@@ -146,6 +146,16 @@
           </div>
         </div>
       </div>
+
+    <!-- Migration: Push local missions to Sheets -->
+    <div id="migrationPanel" class="panel p-5 mb-6" style="border-color: #fbbf24;">
+      <div class="panel-header">
+        <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">⚠ One-Time Migration</h2>
+      </div>
+      <p class="text-sm mb-3" style="color: #9ca3af">If you have missions saved in this browser from before the Google Sheets sync, push them to the server now.</p>
+      <button class="btn btn-amber" onclick="pushLocalMissions()">Push Local Missions to Sheets</button>
+      <span id="migrationStatus" class="ml-3 text-sm" style="color: #4ade80;"></span>
+    </div>
 
     <!-- Stats Bar -->
     <div class="grid grid-cols-4 gap-3 mb-6">
@@ -290,6 +300,33 @@
   </div>
 
   <script>
+
+    // ===== API Backend =====
+    const API = '/api/data';
+    async function apiGet(sheet) {
+      const res = await fetch(`${API}?sheet=${encodeURIComponent(sheet)}`);
+      const json = await res.json();
+      return json.data || [];
+    }
+    async function apiPost(sheet, action, payload = {}) {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheet, action, ...payload })
+      });
+      const json = await res.json();
+      return json;
+    }
+    async function apiUpdate(sheet, id, updates) { return apiPost(sheet, 'update', { id, updates }); }
+    async function apiCreate(sheet, row) { return apiPost(sheet, 'create', { row }); }
+    async function apiDelete(sheet, id) { return apiPost(sheet, 'delete', { id }); }
+    async function syncMission(m) {
+      const existing = await apiGet('Missions');
+      const found = existing.find(x => x.id === m.id);
+      if (found) { await apiUpdate('Missions', m.id, m); }
+      else { await apiCreate('Missions', m); }
+    }
+
     function goBack() {
       if (window.history.length > 1) { window.history.back(); }
       else { window.location.href = '/'; }
@@ -332,7 +369,11 @@
       'finance_lead',
       'Lakshit'
     ];
-    let customStaff = JSON.parse(localStorage.getItem('qla_staff') || '[]');
+    let customStaff = [];
+    async function loadStaff() {
+      const staff = await apiGet('Staff');
+      customStaff = staff.map(s => s.name).filter(Boolean);
+    }
     function allStaff() {
       // Merge agent staff + custom staff, deduplicate
       const merged = [...AGENT_STAFF, ...customStaff];
@@ -394,12 +435,12 @@
       if (picked) { document.getElementById('missionAssigneeManual').value = picked; }
     }
 
-    function onManualAssignee() {
+    async function onManualAssignee() {
       const name = document.getElementById('missionAssigneeManual').value.trim();
       if (!name) return;
       if (!allStaff().includes(name)) {
         customStaff.push(name);
-        localStorage.setItem('qla_staff', JSON.stringify(customStaff));
+        await apiPost('Staff', 'create', { row: { name: name } });
         populateStaffSelect();
       }
     }
@@ -418,7 +459,20 @@
     }
 
     // ===== Missions =====
-    let missions = JSON.parse(localStorage.getItem('qla_missions') || '[]');
+    let missions = [];
+    async function loadMissions() {
+      missions = await apiGet('Missions');
+      missions.forEach(m => {
+        if (!m.name && m.title) m.name = m.title;
+        if (!m.name) m.name = 'Untitled';
+        if (!m.rank) m.rank = 'B';
+        if (!m.status) m.status = 'active';
+        if (!m.acceptance) m.acceptance = 'pending';
+        if (!m.progress) m.progress = 'not_started';
+        if (!m.notes) m.notes = [];
+        if (!m.edits) m.edits = 0;
+      });
+    }
 
     function rankBadge(rank) { return `<span class="rank-badge rank-${rank || 'B'}">${rank || 'B'}</span>`; }
 
@@ -426,7 +480,7 @@
       if (m.status !== 'active') return '';
       if (m.acceptance === 'declined') return 'mission-declined';
       if (!m.acceptance) return 'mission-pending-acceptance';
-      if (m.progress === 'in-progress') return 'mission-in-progress';
+      if (m.progress === 'in_progress') return 'mission-in-progress';
       if (m.progress === 'complete') return 'mission-complete';
       return 'mission-not-started';
     }
@@ -495,11 +549,11 @@
       // Progress selector (only when accepted & active)
       let progressBlock = '';
       if (m.status === 'active' && m.acceptance === 'accepted') {
-        const p = m.progress || 'not-started';
+        const p = m.progress || 'not_started';
         progressBlock = `
           <div class="flex flex-wrap gap-2 mt-2" id="progress-${m.id}">
-            <button class="progress-btn ${p==='not-started'?'active-not-started':''}" onclick="setProgress('${m.id}','not-started')">Not Started</button>
-            <button class="progress-btn ${p==='in-progress'?'active-in-progress':''}" onclick="setProgress('${m.id}','in-progress')">In Progress</button>
+            <button class="progress-btn ${p==='not_started'?'active-not_started':''}" onclick="setProgress('${m.id}','not_started')">Not Started</button>
+            <button class="progress-btn ${p==='in_progress'?'active-in_progress':''}" onclick="setProgress('${m.id}','in_progress')">In Progress</button>
             <button class="progress-btn ${p==='complete'?'active-complete':''}" onclick="setProgress('${m.id}','complete')">Complete</button>
           </div>
         `;
@@ -510,14 +564,14 @@
       if (m.status === 'active') {
         if (!m.acceptance) statusLabel = 'pending';
         else if (m.acceptance === 'declined') statusLabel = 'declined';
-        else statusLabel = m.progress || 'not-started';
+        else statusLabel = m.progress || 'not_started';
       }
 
       return `
         <div class="p-3 rounded-lg border border-lms-border mission-progress-base ${progressClass(m)}" style="background: rgba(0,0,0,0.2)">
           <div class="flex items-start justify-between mb-1 gap-2">
             <div class="flex items-center gap-2 flex-1 min-w-0">
-              <span class="font-semibold text-sm">${m.title}</span>
+              <span class="font-semibold text-sm">${m.name}</span>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               ${noteAlert}
@@ -580,12 +634,12 @@
         : archFiltered.map(m => missionCard(m, false)).join('');
     }
 
-    function addMission() {
+    async function addMission() {
       const title = document.getElementById('missionTitle').value.trim();
       if (!title) { alert('Please enter mission name'); return; }
       const mission = {
         id: 'm-' + Date.now().toString(36),
-        title,
+        name: title,
         rank: document.getElementById('missionRank').value,
         description: document.getElementById('missionDesc').value.trim(),
         company: document.getElementById('missionCompany').value,
@@ -595,24 +649,24 @@
         updated_at: new Date().toISOString(),
         source: 'web'
       };
+      await apiCreate('Missions', mission);
       missions.push(mission);
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
       document.getElementById('missionTitle').value = '';
       document.getElementById('missionDesc').value = '';
       document.getElementById('missionAssigneeManual').value = '';
       renderMissions();
     }
 
-    function updateStatus(id, status) {
+    async function updateStatus(id, status) {
       const m = missions.find(x => x.id === id);
       if (m) { m.status = status; m.updated_at = new Date().toISOString(); }
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       renderMissions();
     }
 
-    function deleteMission(id) {
+    async function deleteMission(id) {
+      await apiDelete('Missions', id);
       missions = missions.filter(x => x.id !== id);
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
       renderMissions();
     }
 
@@ -620,7 +674,7 @@
     function editMission(id) {
       const m = missions.find(x => x.id === id);
       if (!m) return;
-      document.getElementById('editTitle').value = m.title;
+      document.getElementById('editTitle').value = m.name;
       document.getElementById('editRank').value = m.rank || 'B';
       document.getElementById('editDesc').value = m.description || '';
       document.getElementById('editCompany').value = m.company || '';
@@ -633,52 +687,52 @@
       document.getElementById('editModal').style.display = 'none';
     }
 
-    function saveEditMission() {
+    async function saveEditMission() {
       const id = document.getElementById('editMissionId').value;
       const m = missions.find(x => x.id === id);
       if (!m) return;
       const title = document.getElementById('editTitle').value.trim();
       if (!title) { alert('Mission name cannot be empty'); return; }
-      m.title = title;
+      m.name = title;
       m.rank = document.getElementById('editRank').value;
       m.description = document.getElementById('editDesc').value.trim();
       m.company = document.getElementById('editCompany').value;
       m.assigned_to = document.getElementById('editAssignee').value.trim();
       m.edits = (m.edits || 0) + 1;
       m.updated_at = new Date().toISOString();
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       closeEditModal();
       renderMissions();
     }
 
     // ===== Acceptance workflow =====
-    function acceptMission(id) {
+    async function acceptMission(id) {
       const m = missions.find(x => x.id === id);
       if (!m) return;
       m.acceptance = 'accepted';
       m.accepted_at = new Date().toISOString();
-      m.progress = 'not-started';
+      m.progress = 'not_started';
       m.updated_at = new Date().toISOString();
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       renderMissions();
     }
 
-    function declineMission(id) {
+    async function declineMission(id) {
       const m = missions.find(x => x.id === id);
       if (!m) return;
       m.acceptance = 'declined';
       m.declined_at = new Date().toISOString();
       m.updated_at = new Date().toISOString();
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       renderMissions();
     }
 
-    function setProgress(id, progress) {
+    async function setProgress(id, progress) {
       const m = missions.find(x => x.id === id);
       if (!m) return;
       m.progress = progress;
       m.updated_at = new Date().toISOString();
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       renderMissions();
     }
 
@@ -701,7 +755,7 @@
       const m = missions.find(x => x.id === id);
       if (!m) return;
       document.getElementById('notesMissionId').value = id;
-      document.getElementById('notesMissionTitle').textContent = m.title;
+      document.getElementById('notesMissionTitle').textContent = m.name;
       // Default author = assignee (the agent working the mission)
       document.getElementById('noteAuthor').value = m.assigned_to || '';
       renderNotes(m);
@@ -749,7 +803,7 @@
       }).join('');
     }
 
-    function addNote() {
+    async function addNote() {
       const id = document.getElementById('notesMissionId').value;
       const m = missions.find(x => x.id === id);
       if (!m) return;
@@ -759,22 +813,22 @@
       if (!m.notes) m.notes = [];
       m.notes.push({ by, text, at: new Date().toISOString(), acknowledged: false, response: null });
       m.updated_at = new Date().toISOString();
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       document.getElementById('noteText').value = '';
       renderNotes(m);
       renderMissions();
     }
 
-    function ackNote(id, idx) {
+    async function ackNote(id, idx) {
       const m = missions.find(x => x.id === id);
       if (!m || !m.notes[idx]) return;
       m.notes[idx].acknowledged = true;
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       renderNotes(m);
       renderMissions();
     }
 
-    function respondNote(id, idx) {
+    async function respondNote(id, idx) {
       const m = missions.find(x => x.id === id);
       if (!m || !m.notes[idx]) return;
       const input = document.getElementById('noteResponse' + idx);
@@ -783,16 +837,61 @@
       const by = document.getElementById('noteAuthor').value.trim() || 'assigner';
       m.notes[idx].response = { by, text, at: new Date().toISOString() };
       m.notes[idx].acknowledged = true; // responding counts as checking off
-      localStorage.setItem('qla_missions', JSON.stringify(missions));
+      await syncMission(m);
       renderNotes(m);
       renderMissions();
     }
 
     // Init
-    populateCompanySelect();
-    populateStaffSelect();
-    populateFilterDropdowns();
-    renderMissions();
+    (async () => {
+      await loadMissions();
+      await loadStaff();
+      populateCompanySelect();
+      populateStaffSelect();
+      populateFilterDropdowns();
+      renderMissions();
+    })();
+
+    // ===== Migration: push localStorage missions to Sheets =====
+    async function pushLocalMissions() {
+      const statusEl = document.getElementById('migrationStatus');
+      const local = JSON.parse(localStorage.getItem('qla_missions') || '[]');
+      if (local.length === 0) {
+        statusEl.textContent = 'No local missions found.';
+        statusEl.style.color = '#9ca3af';
+        return;
+      }
+      statusEl.textContent = `Pushing ${local.length} mission(s)...`;
+      statusEl.style.color = '#fbbf24';
+      let pushed = 0;
+      for (const m of local) {
+        // Normalize field names for the API
+        const row = {
+          id: m.id || 'm-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          name: m.name || m.title || 'Untitled',
+          rank: m.rank || 'B',
+          description: m.description || '',
+          company: m.company || '',
+          assigned_to: m.assigned_to || '',
+          status: m.status || 'active',
+          acceptance: m.acceptance || 'pending',
+          progress: m.progress || 'not_started',
+          notes: JSON.stringify(m.notes || []),
+          edits: m.edits || 0,
+          created_at: m.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source: 'migration'
+        };
+        await apiCreate('Missions', row);
+        pushed++;
+      }
+      statusEl.textContent = `✓ ${pushed} mission(s) pushed to Sheets.`;
+      statusEl.style.color = '#4ade80';
+      // Hide the migration panel after successful push
+      setTimeout(() => {
+        document.getElementById('migrationPanel').style.display = 'none';
+      }, 3000);
+    }
 
     // Close modals: ESC key or backdrop click
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditModal(); closeNotesModal(); } });
