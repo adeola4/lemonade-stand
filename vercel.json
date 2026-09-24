@@ -10,6 +10,7 @@
     { "src": "brain.html", "use": "@vercel/static" },
     { "src": "docs.html", "use": "@vercel/static" },
     { "src": "content-advisor.html", "use": "@vercel/static" },
+    { "src": "database.html", "use": "@vercel/static" },
     { "src": "assets/**", "use": "@vercel/static" }
   ],
   "routes": [
