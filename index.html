@@ -90,35 +90,28 @@
 
     <!-- Weekly Goals Panel -->
     <div id="weeklyGoals" class="panel p-5 mb-6" style="border-color: #374151;">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full animate-pulse" style="background: #fbbf24;"></span>
           <h2 class="text-sm font-bold uppercase tracking-wider" style="color: #fbbf24">Week Goals</h2>
           <span class="text-xs font-mono" style="color: #6b7280">Sep 24 — Sep 30</span>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="openGoalModal()">✎ Edit Goals</button>
+        <button class="btn btn-ghost btn-sm" onclick="openGoalModal()">✎ Edit</button>
       </div>
-      <div class="grid grid-cols-3 gap-4">
-        <div class="rounded-lg p-3" style="background: rgba(96,165,250,0.06); border: 1px solid rgba(96,165,250,0.15);">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-mono font-bold w-5 h-5 rounded flex items-center justify-center" style="background: rgba(96,165,250,0.2); color: #60a5fa;">1</span>
-            <span class="text-sm font-medium" style="color: #f3f4f6">Global Data Sync</span>
-          </div>
-          <p class="text-xs" style="color: #9ca3af">All pages use API backend — zero localStorage</p>
+      <div class="flex items-center gap-3 mt-2">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs font-mono font-bold w-4 h-4 rounded flex items-center justify-center" style="background: rgba(96,165,250,0.2); color: #60a5fa;">1</span>
+          <span class="text-sm" style="color: #d1d5db">Global Data Sync</span>
         </div>
-        <div class="rounded-lg p-3" style="background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.15);">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-mono font-bold w-5 h-5 rounded flex items-center justify-center" style="background: rgba(251,191,36,0.2); color: #fbbf24;">2</span>
-            <span class="text-sm font-medium" style="color: #f3f4f6">Voice Control</span>
-          </div>
-          <p class="text-xs" style="color: #9ca3af">Discord voice channel conversation with the agent</p>
+        <span style="color: #374151;">|</span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs font-mono font-bold w-4 h-4 rounded flex items-center justify-center" style="background: rgba(251,191,36,0.2); color: #fbbf24;">2</span>
+          <span class="text-sm" style="color: #d1d5db">Voice Control</span>
         </div>
-        <div class="rounded-lg p-3" style="background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15);">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-mono font-bold w-5 h-5 rounded flex items-center justify-center" style="background: rgba(74,222,128,0.2); color: #4ade80;">3</span>
-            <span class="text-sm font-medium" style="color: #f3f4f6">Verified Metrics</span>
-          </div>
-          <p class="text-xs" style="color: #9ca3af">Dashboard shows live mission/loop counts globally</p>
+        <span style="color: #374151;">|</span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs font-mono font-bold w-4 h-4 rounded flex items-center justify-center" style="background: rgba(74,222,128,0.2); color: #4ade80;">3</span>
+          <span class="text-sm" style="color: #d1d5db">Verified Metrics</span>
         </div>
       </div>
     </div>
