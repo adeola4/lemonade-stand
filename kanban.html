@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // KANBAN BOARD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' }
+          },
+          fontFamily: { mono: ['Courier New', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all 0.2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'Inter', system-ui, sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn-amber { background: transparent; color: #fbbf24; border-color: #fbbf24; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.12); color: #fde68a; }
+    .btn-red { background: transparent; color: #f87171; border-color: #f87171; }
+    .btn-red:hover { background: rgba(248, 113, 113, 0.12); color: #fca5a5; }
+    .btn-green { background: transparent; color: #4ade80; border-color: #4ade80; }
+    .btn-green:hover { background: rgba(74, 222, 128, 0.12); color: #6ee7b7; }
+    .pill { padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+    .pill-todo { background: #1f2937; color: #9ca3af; border: 1px solid #374151; }
+    .pill-in_progress { background: #78350f; color: #fbbf24; border: 1px solid #f59e0b; }
+    .pill-in_review { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
+    .pill-done { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
+    .pill-blocked { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+    .pill-voice { background: #312e81; color: #a5b4fc; border: 1px solid #6366f1; }
+    .pill-manual { background: #1f2937; color: #9ca3af; border: 1px solid #374151; }
+    .kanban-col { background: rgba(0,0,0,0.25); border: 1px solid #374151; border-radius: 10px; min-height: 300px; }
+    .kanban-col-header { padding: 10px 14px; border-bottom: 1px solid #374151; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .kanban-card { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px; transition: all 0.2s; }
+    .kanban-card:hover { border-color: #fbbf24; }
+    .kanban-card.blocked { border-left: 4px solid #ef4444; }
+    .kanban-card.done { border-left: 4px solid #10b981; opacity: 0.75; }
+    .kanban-card.in_progress { border-left: 4px solid #f59e0b; }
+    .kanban-card.in_review { border-left: 4px solid #3b82f6; }
+    .kanban-card.todo { border-left: 4px solid #6b7280; }
+    .stat-box { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px 16px; }
+    .stat-num { font-size: 24px; font-weight: 800; font-family: 'Courier New', monospace; }
+    input, select, textarea { background: #0d1017; border: 1px solid #374151; color: #f3f4f6; padding: 10px 14px; border-radius: 6px; font-size: 13px; width: 100%; font-family: 'Inter', system-ui, sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #fbbf24; }
+    label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; display: block; margin-bottom: 4px; }
+    .meta { font-size: 10px; color: #6b7280; font-family: 'Courier New', monospace; }
+    .empty-col { text-align: center; color: #4b5563; font-size: 12px; padding: 30px 10px; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background: #111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-lg font-bold font-mono tracking-wider" style="color: #fbbf24">LMS</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item">QLA Bot</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item">Missions</a>
+          <a href="/kanban.html" class="nav-item active">Kanban</a>
+          <a href="/links.html" class="nav-item">Links</a>
+          <a href="/brain.html" class="nav-item">Brain</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color: #9ca3af">v1.0</span>
+        <span class="text-xs font-mono px-2 py-1 rounded" style="background: #065f46; color: #4ade80">● LIVE</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold font-mono tracking-wider" style="color: #fbbf24">KANBAN BOARD</h1>
+        <p class="text-sm mt-1" style="color: #9ca3af">Every task tracked to completion — nothing spoken is ever lost.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-amber" onclick="openAddModal()">+ New Task</button>
+        <button class="btn btn-ghost" onclick="loadBoard()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+      <div class="stat-box"><div class="text-xs uppercase tracking-wider" style="color:#9ca3af">Backlog</div><div class="stat-num" style="color:#9ca3af" id="statTodo">0</div></div>
+      <div class="stat-box"><div class="text-xs uppercase tracking-wider" style="color:#9ca3af">In Progress</div><div class="stat-num" style="color:#fbbf24" id="statInProgress">0</div></div>
+      <div class="stat-box"><div class="text-xs uppercase tracking-wider" style="color:#9ca3af">In Review</div><div class="stat-num" style="color:#60a5fa" id="statInReview">0</div></div>
+      <div class="stat-box"><div class="text-xs uppercase tracking-wider" style="color:#9ca3af">Done</div><div class="stat-num" style="color:#4ade80" id="statDone">0</div></div>
+      <div class="stat-box"><div class="text-xs uppercase tracking-wider" style="color:#9ca3af">Blocked</div><div class="stat-num" style="color:#f87171" id="statBlocked">0</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="panel p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label>Filter by Company</label>
+          <select id="filterCompany" onchange="renderBoard()"><option value="">All Companies</option></select>
+        </div>
+        <div>
+          <label>Filter by Owner</label>
+          <select id="filterOwner" onchange="renderBoard()"><option value="">All Owners</option></select>
+        </div>
+        <div>
+          <label>Filter by Source</label>
+          <select id="filterSource" onchange="renderBoard()"><option value="">All Sources</option><option value="voice">Voice Transcript</option><option value="manual">Manual</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" id="board"></div>
+  </main>
+
+  <!-- Add/Edit Modal -->
+  <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100; align-items:center; justify-content:center; padding:1rem;">
+    <div class="panel p-6" style="max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
+      <h2 class="text-sm font-bold uppercase tracking-wider mb-4" style="color:#fbbf24" id="modalTitle">+ New Task</h2>
+      <input type="hidden" id="editId">
+      <div class="space-y-3">
+        <div>
+          <label>Objective *</label>
+          <input type="text" id="editObjective" placeholder="What needs to be done?">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label>Owner</label>
+            <input type="text" id="editOwner" placeholder="Who owns it?">
+          </div>
+          <div>
+            <label>Company / Deal</label>
+            <input type="text" id="editCompany" placeholder="e.g. Coastal Flip Marine">
+          </div>
+        </div>
+        <div>
+          <label>Acceptance Criteria</label>
+          <textarea id="editAcceptance" rows="2" placeholder="What does done look like?"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label>State</label>
+            <select id="editState">
+              <option value="todo">Backlog</option>
+              <option value="in_progress">In Progress</option>
+              <option value="in_review">In Review</option>
+              <option value="done">Done</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+          <div>
+            <label>Dependencies</label>
+            <input type="text" id="editDeps" placeholder="Comma-separated task IDs">
+          </div>
+        </div>
+        <div>
+          <label>Notes / Evidence</label>
+          <textarea id="editNotes" rows="2" placeholder="Progress notes, evidence, links"></textarea>
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <button class="btn btn-red" id="deleteBtn" onclick="deleteCard()">Delete</button>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-amber" onclick="saveCard()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== API Backend (same as missions.html) =====
+    const API = 'http://129.213.81.33:8645/data';
+    const API_KEY = 'lms-default-key-2026';
+    const SHEET = 'Kanban';
+    const COLUMNS = [
+      { key: 'todo', label: 'Backlog', color: '#9ca3af' },
+      { key: 'in_progress', label: 'In Progress', color: '#fbbf24' },
+      { key: 'in_review', label: 'In Review', color: '#60a5fa' },
+      { key: 'done', label: 'Done', color: '#4ade80' },
+      { key: 'blocked', label: 'Blocked', color: '#f87171' }
+    ];
+    const NEXT_STATE = { todo: 'in_progress', in_progress: 'in_review', in_review: 'done', done: 'done', blocked: 'in_progress' };
+
+    async function apiGet(sheet) {
+      const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, { headers: { 'X-API-Key': API_KEY } });
+      const json = await res.json();
+      return json.data || [];
+    }
+    async function apiPost(sheet, action, payload = {}) {
+      const res = await fetch(`${API}/${encodeURIComponent(sheet)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return res.json();
+    }
+    const apiUpdate = (sheet, id, updates) => apiPost(sheet, 'update', { id, updates });
+    const apiCreate = (sheet, row) => apiPost(sheet, 'create', { row });
+    const apiDelete = (sheet, id) => apiPost(sheet, 'delete', { id });
+
+    function goBack() { if (window.history.length > 1) window.history.back(); else window.location.href = '/'; }
+
+    let board = [];
+
+    async function loadBoard() {
+      board = await apiGet(SHEET);
+      populateFilters();
+      renderBoard();
+    }
+
+    function populateFilters() {
+      const companies = new Set(board.map(c => c.company).filter(Boolean));
+      const owners = new Set(board.map(c => c.owner).filter(Boolean));
+      const fc = document.getElementById('filterCompany');
+      const fo = document.getElementById('filterOwner');
+      const curC = fc.value, curO = fo.value;
+      fc.innerHTML = '<option value="">All Companies</option>' + [...companies].sort().map(c => `<option value="${c}">${c}</option>`).join('');
+      fo.innerHTML = '<option value="">All Owners</option>' + [...owners].sort().map(c => `<option value="${c}">${c}</option>`).join('');
+      fc.value = curC; fo.value = curO;
+    }
+
+    function renderBoard() {
+      const fc = document.getElementById('filterCompany').value;
+      const fo = document.getElementById('filterOwner').value;
+      const fs = document.getElementById('filterSource').value;
+      const filtered = board.filter(c =>
+        (!fc || c.company === fc) && (!fo || c.owner === fo) && (!fs || (c.source || 'manual') === fs)
+      );
+      const counts = { todo: 0, in_progress: 0, in_review: 0, done: 0, blocked: 0 };
+      filtered.forEach(c => { counts[c.state] = (counts[c.state] || 0) + 1; });
+      document.getElementById('statTodo').textContent = counts.todo;
+      document.getElementById('statInProgress').textContent = counts.in_progress;
+      document.getElementById('statInReview').textContent = counts.in_review;
+      document.getElementById('statDone').textContent = counts.done;
+      document.getElementById('statBlocked').textContent = counts.blocked;
+
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      COLUMNS.forEach(col => {
+        const cards = filtered.filter(c => c.state === col.key);
+        const colEl = document.createElement('div');
+        colEl.className = 'kanban-col';
+        colEl.innerHTML = `
+          <div class="kanban-col-header flex items-center justify-between" style="color:${col.color}">
+            <span>${col.label}</span>
+            <span class="font-mono">${cards.length}</span>
+          </div>
+          <div class="p-2 space-y-2">${cards.length ? cards.map(c => cardHTML(c)).join('') : '<div class="empty-col">No tasks</div>'}</div>
+        `;
+        boardEl.appendChild(colEl);
+      });
+    }
+
+    function cardHTML(c) {
+      const src = (c.source || 'manual') === 'voice'
+        ? '<span class="pill pill-voice">🎙 Voice</span>'
+        : '<span class="pill pill-manual">Manual</span>';
+      const deps = c.dependencies ? `<div class="meta mt-1">Deps: ${c.dependencies}</div>` : '';
+      const evidence = c.notes ? `<div class="text-xs mt-1" style="color:#9ca3af">${c.notes}</div>` : '';
+      const created = c.created_at ? new Date(c.created_at).toLocaleDateString() : '';
+      const next = NEXT_STATE[c.state];
+      const nextLabel = next === 'done' ? '✓ Complete' : next === 'in_review' ? '→ Review' : next === 'in_progress' ? '→ Start' : '→ Next';
+      return `
+        <div class="kanban-card ${c.state}" onclick="openEdit('${c.id}')" style="cursor:pointer">
+          <div class="flex items-start justify-between gap-2">
+            <div class="text-sm font-semibold" style="color:#f3f4f6">${c.objective || 'Untitled'}</div>
+            ${src}
+          </div>
+          ${c.company ? `<div class="text-xs mt-1" style="color:#fbbf24">${c.company}</div>` : ''}
+          ${c.owner ? `<div class="text-xs mt-1" style="color:#60a5fa">👤 ${c.owner}</div>` : ''}
+          ${c.acceptance_criteria ? `<div class="text-xs mt-1" style="color:#9ca3af">✓ ${c.acceptance_criteria}</div>` : ''}
+          ${evidence}
+          ${deps}
+          <div class="flex items-center justify-between mt-2">
+            <span class="meta">${created}</span>
+            ${c.state !== 'done' ? `<button class="btn btn-ghost" style="padding:3px 10px;font-size:10px" onclick="event.stopPropagation();advance('${c.id}')">${nextLabel}</button>` : ''}
+          </div>
+        </div>`;
+    }
+
+    async function advance(id) {
+      const card = board.find(c => c.id === id);
+      if (!card) return;
+      const next = NEXT_STATE[card.state];
+      const updates = { state: next, updated_at: new Date().toISOString() };
+      if (next === 'done') updates.completed_at = new Date().toISOString();
+      await apiUpdate(SHEET, id, updates);
+      await loadBoard();
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = '+ New Task';
+      document.getElementById('editId').value = '';
+      document.getElementById('editObjective').value = '';
+      document.getElementById('editOwner').value = '';
+      document.getElementById('editCompany').value = '';
+      document.getElementById('editAcceptance').value = '';
+      document.getElementById('editState').value = 'todo';
+      document.getElementById('editDeps').value = '';
+      document.getElementById('editNotes').value = '';
+      document.getElementById('deleteBtn').style.display = 'none';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function openEdit(id) {
+      const c = board.find(x => x.id === id);
+      if (!c) return;
+      document.getElementById('modalTitle').textContent = '✎ Edit Task';
+      document.getElementById('editId').value = c.id;
+      document.getElementById('editObjective').value = c.objective || '';
+      document.getElementById('editOwner').value = c.owner || '';
+      document.getElementById('editCompany').value = c.company || '';
+      document.getElementById('editAcceptance').value = c.acceptance_criteria || '';
+      document.getElementById('editState').value = c.state || 'todo';
+      document.getElementById('editDeps').value = c.dependencies || '';
+      document.getElementById('editNotes').value = c.notes || '';
+      document.getElementById('deleteBtn').style.display = 'inline-flex';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    async function saveCard() {
+      const id = document.getElementById('editId').value;
+      const objective = document.getElementById('editObjective').value.trim();
+      if (!objective) { alert('Objective is required'); return; }
+      const data = {
+        objective,
+        owner: document.getElementById('editOwner').value.trim(),
+        company: document.getElementById('editCompany').value.trim(),
+        acceptance_criteria: document.getElementById('editAcceptance').value.trim(),
+        state: document.getElementById('editState').value,
+        dependencies: document.getElementById('editDeps').value.trim(),
+        notes: document.getElementById('editNotes').value.trim(),
+        updated_at: new Date().toISOString()
+      };
+      if (id) {
+        await apiUpdate(SHEET, id, data);
+      } else {
+        data.id = 'task_' + Date.now();
+        data.created_at = new Date().toISOString();
+        data.source = 'manual';
+        await apiCreate(SHEET, data);
+      }
+      closeModal();
+      await loadBoard();
+    }
+
+    async function deleteCard() {
+      const id = document.getElementById('editId').value;
+      if (!id) return;
+      if (!confirm('Delete this task permanently?')) return;
+      await apiDelete(SHEET, id);
+      closeModal();
+      await loadBoard();
+    }
+
+    // Auto-refresh every 30s
+    loadBoard();
+    setInterval(loadBoard, 30000);
+  </script>
+</body>
+</html>
