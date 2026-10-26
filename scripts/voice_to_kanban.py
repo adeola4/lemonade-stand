@@ -2,9 +2,10 @@
 """Voice transcript -> Kanban task ingestion for Lemonade Stand.
 
 Reads the daily voice transcripts in ~/hermes-archive/transcripts/, extracts
-distinct tasks/deals/decisions/commitments, and creates them as Kanban board
-cards (sheet 'Kanban' on the LMS data server). Deduped by normalized objective
-so nothing spoken is ever lost and nothing is created twice.
+distinct tasks/deals/decisions/commitments from BOTH the user's spoken words
+and the bot's replies, and creates them as Kanban board cards (sheet 'Kanban'
+on the LMS data server). Deduped by normalized objective so nothing spoken is
+ever lost and nothing is created twice.
 
 Runs on the daily cron alongside the transcript archiver.
 """
@@ -21,18 +22,19 @@ API = 'http://127.0.0.1:8646/data'
 API_KEY = 'lms-default-key-2026'
 SHEET = 'Kanban'
 
-# Task-like signals: imperative verbs, commitments, "we need to", "I want to",
-# "let's", "start", "build", "set up", "reach out", "follow up", "close", etc.
+# Task-like signals: commitment phrases and strong task verbs. Prefer explicit
+# commitments ("I'll build", "we need to", "I want to") over bare verbs, which
+# match too much conversational filler in assistant replies.
 TASK_SIGNAL_RE = re.compile(
-    r'\b(?:we need to|we should|we have to|i want to|i need to|let\'s|lets|'
-    r'start|build|set up|create|make|reach out|follow up|follow-up|'
-    r'close|sign|send|email|call|schedule|book|research|find|source|'
-    r'negotiate|draft|write|prepare|launch|deploy|fix|update|add|remove|'
-    r'get|secure|finalize|execute|run|track|log|organize)\b',
+    r'\b(?:i\'ll|i will|i\'m going to|we need to|we should|we have to|'
+    r'i want to|i need to|let\'s|lets|we\'ll|we will|'
+    r'start|build|set up|create|make sure|reach out|follow up|follow-up|'
+    r'close|sign|schedule|book|research|source|negotiate|draft|prepare|'
+    r'launch|deploy|fix|finalize|execute|track|organize)\b',
     re.IGNORECASE,
 )
 
-# Bot/system markers that voice mode threads into User sections of the transcript.
+# Bot/system markers that voice mode threads into transcript sections.
 BOT_MARKERS = (
     '[hermes agent [bot]]', '[Replying to:', '•', '**', '⚠️', '⌛',
     'cd /home/ubuntu', 'open(p,', '```', 'Do you want Hermes',
@@ -70,24 +72,24 @@ def save_state(state):
 
 
 def extract_tasks(text):
-    """Split transcript into candidate task lines from USER turns only.
+    """Split transcript into candidate task lines from USER and ASSISTANT turns.
 
-    The transcript interleaves User and Assistant sections. Only the user's
-    spoken words are task candidates — assistant replies and system messages
-    are never ingested.
+    The transcript interleaves User and Assistant sections. Both the user's
+    spoken words AND the bot's replies are task candidates — assistant replies
+    often contain commitments, next steps, and decisions worth tracking.
+    System/tool sections are never ingested.
     """
     candidates = []
-    in_user = False
+    in_turn = False
     for line in text.splitlines():
         line = line.strip()
-        if line.startswith('## User'):
-            in_user = True
+        if line.startswith('## User') or line.startswith('## Assistant'):
+            in_turn = True
             continue
-        if line.startswith('## Assistant') or line.startswith('## Tool') \
-           or line.startswith('## Session_meta'):
-            in_user = False
+        if line.startswith('## Tool') or line.startswith('## Session_meta'):
+            in_turn = False
             continue
-        if not in_user:
+        if not in_turn:
             continue
         if not line or len(line) < 12:
             continue
@@ -95,11 +97,15 @@ def extract_tasks(text):
         if line.startswith('#') or line.startswith('---') or line.startswith('Generated:') \
            or line.startswith('Sessions covered:'):
             continue
-        # Skip bot/system content that voice mode threads into User sections
+        # Skip bot/system markers
         if any(m in line for m in BOT_MARKERS):
             continue
-        # Drop code references and numbered-list items (assistant output)
-        if '`' in line or re.match(r'^\d+\.\s', line):
+        # Drop code references, numbered-list items, and shell commands (assistant output)
+        if '`' in line or re.match(r'^\d+\.\s', line) or line.startswith('sudo ') \
+           or line.startswith('cd ') or line.startswith('python3 ') or line.startswith('hermes '):
+            continue
+        # Drop short conversational fragments that aren't real tasks
+        if len(line) < 30:
             continue
         if TASK_SIGNAL_RE.search(line):
             candidates.append(line)
