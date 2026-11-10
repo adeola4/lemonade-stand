@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "source": {
     "primary": "qla_usb_slides_full.txt — QLA Castle Seminar slides",
     "detail": "SOURCE_MAP.md",
@@ -305,7 +305,7 @@
       "name": "The engine room — not in the source",
       "pena_says": "Not in the source. This is the machine that runs the twelve, and it is labelled as ours.",
       "cite": "our own requirement",
-      "one_line": "It wakes daily, refuses to spend money, refuses to send twice, and keeps a log of everything it did.",
+      "one_line": "It wakes repeatedly, refuses to spend money, refuses to send twice, and computes how much outbound it takes to make waiting irrelevant.",
       "bot_does": "Schedules the cycle, gates credentials, stamps provenance, and (once built) holds single-flight locks, an audit log, dead-letter retry and a kill switch.",
       "you_get": "Today: a cycle that runs, reports, and queues what needs you. Missing: the locks and audit trail that make it safe to run unattended.",
       "status": "partial",
@@ -327,11 +327,12 @@
         "T9.03",
         "T9.04",
         "T9.05",
-        "T9.06"
+        "T9.06",
+        "T0.11"
       ],
       "cadence": "Always on",
-      "output_per_run": "A cycle that wakes, sweeps, stages, reads and reports — repeatedly, without you.",
-      "ceiling": "The locks and audit trail (T0.04, T0.07–T0.09). Without them, volume stops being output and becomes blast radius."
+      "output_per_run": "A cycle that wakes, sweeps, stages, reads and reports — plus (once built) a send plan that turns a reply-rate target into mailboxes, sends per day and messages in flight.",
+      "ceiling": "Deliverability: per-mailbox send caps, not hours. The governor (T0.11) exists so the multiple is spent where it survives — many mailboxes, many domains, one touch cap."
     }
   ]
 }

@@ -1,0 +1,37 @@
+{
+  "generated": "2026-11-10T19:20:46+00:00",
+  "measured": {
+    "prospects": 31,
+    "mx_ok": 31,
+    "by_role": {
+      "broker": 17,
+      "lender": 6,
+      "accountant": 5,
+      "counsel": 3
+    },
+    "staged": 10,
+    "sent": 0,
+    "refused": 0,
+    "replied": 0,
+    "reply_rate": 0.15,
+    "reply_rate_source": "assumed (15% \u2014 industry band for targeted broker/CPA outreach; unverified here)",
+    "latency_days": 3.0,
+    "latency_source": "assumed (3 days \u2014 a business reply usually lands inside a working week); zero replies observed yet"
+  },
+  "plan": {
+    "target_replies_per_day": 10.0,
+    "sends_per_day": 66.7,
+    "in_flight_at_any_moment": 200.0,
+    "mailboxes_needed": 0.4,
+    "mailboxes_rounded": 1,
+    "unique_prospects_needed": 6000.0,
+    "harvest_per_day": 66.7,
+    "assumptions": {
+      "reply_rate": 0.15,
+      "latency_days": 3.0,
+      "per_mailbox_per_day": 150,
+      "touch_cap_days": 90
+    }
+  },
+  "law": "L = lambda x W  (Little's Law): concurrency, not speed, removes latency as a bottleneck"
+}

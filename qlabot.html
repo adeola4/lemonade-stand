@@ -78,6 +78,8 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="orderStrip"></div>
       </div>
 
+      <div class="panel p-4 mb-5" id="throughputPanel"></div>
+
       <div class="flex flex-wrap items-center gap-3 mb-4" id="legend"></div>
 
       <div id="workstreams" class="space-y-3"></div>
@@ -261,12 +263,35 @@
       if (!board.children.length) board.innerHTML = '<p class="text-sm" style="color:#9ca3af">No tasks match this filter.</p>';
     }
 
+    function renderThroughput(tp) {
+      const el = document.getElementById('throughputPanel');
+      if (!tp) { el.innerHTML = '<p class="text-xs" style="color:#6b7280">Throughput arithmetic not generated yet — run <span class="mono">throughput.py write</span>.</p>'; return; }
+      const m = tp.measured, pl = tp.plan;
+      const cell = (k, v, c) => `<div><div class="text-xs uppercase tracking-wider" style="color:#9ca3af">${k}</div><div class="text-xl font-bold mono" style="color:${c || '#f3f4f6'}">${v}</div></div>`;
+      const rows = [
+        ['Reply rate used', (m.reply_rate * 100).toFixed(0) + '%', '#f3f4f6'],
+        ['Latency used', m.latency_days + 'd', '#f3f4f6'],
+        ['Replies/day wanted', pl.target_replies_per_day, '#60a5fa'],
+        ['Sends/day required', pl.sends_per_day, '#60a5fa'],
+        ['In flight at any moment', pl.in_flight_at_any_moment, '#a78bfa'],
+        ['Mailboxes needed', pl.mailboxes_rounded, '#fbbf24'],
+        ['Prospects to sustain it', pl.unique_prospects_needed.toLocaleString(), '#fbbf24'],
+        ['Verified today', m.mx_ok, m.mx_ok >= pl.unique_prospects_needed ? '#4ade80' : '#f87171'],
+      ];
+      el.innerHTML = `
+        <div class="text-xs uppercase tracking-wider mb-1" style="color:#9ca3af">The only bottleneck, removed by arithmetic</div>
+        <p class="text-sm mb-3" style="color:#e5e7eb">L = λ × W. Latency only hurts when few conversations are open. Open enough and replies arrive on their own schedule — the wait disappears without anyone replying faster.</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">${rows.map(r => cell(...r)).join('')}</div>
+        <p class="text-xs mt-3" style="color:#6b7280">Stamped: reply rate ${m.reply_rate_source}; latency ${m.latency_source}. Generated ${tp.generated}.</p>`;
+    }
+
     Promise.all([
       fetch('/data/tanqlabot_simple.json').then(r => { if (!r.ok) throw new Error('simple ' + r.status); return r.json(); }),
-      fetch('/data/tanqlabot_tasks.json').then(r => { if (!r.ok) throw new Error('tasks ' + r.status); return r.json(); })
-    ]).then(([s, t]) => {
+      fetch('/data/tanqlabot_tasks.json').then(r => { if (!r.ok) throw new Error('tasks ' + r.status); return r.json(); }),
+      fetch('/data/tanqlabot_throughput.json').then(r => r.ok ? r.json() : null).catch(() => null)
+    ]).then(([s, t, tp]) => {
       SIMPLE = s; TASKS = t;
-      renderSimple(); renderTotals(); renderFilters(); renderBoard();
+      renderSimple(); renderTotals(); renderFilters(); renderBoard(); renderThroughput(tp);
       if (location.hash === '#advanced') toggleAdvanced();
     }).catch(e => {
       document.getElementById('workstreams').innerHTML =
