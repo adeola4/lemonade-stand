@@ -69,8 +69,8 @@
     <!-- ═══════════════ SIMPLE VIEW ═══════════════ -->
     <section id="simple">
       <div class="mb-5">
-        <h1 class="text-2xl font-bold">The QLA buying sequence — 120 days</h1>
-        <p class="text-sm mt-1" style="color:#9ca3af">The order Peña actually ran it in, verbatim from the QLA Castle Seminar slides: the 120-day completion timeline (slide 1586) and the 11 Step Action Plan (slide 1862). Each card carries the line and the slide number. Where a step has no slide behind it, the card says so.</p>
+        <h1 class="text-2xl font-bold">The QLA buying sequence — 14 days</h1>
+        <p class="text-sm mt-1" style="color:#9ca3af">The twelve steps, in Peña's order, re-timed. His 120 days (slide 1586) measured a man doing one thing at a time by phone and post; the 11 Step Action Plan is slide 1862. The sequence is his — the clock is ours: same lanes, run in parallel, and the machine half collapses to hours. Each card shows the step, the verbatim line, the slide, and the human gate that actually sets the date.</p>
       </div>
 
       <div class="panel p-4 mb-5">
@@ -184,7 +184,9 @@
             <p class="text-xs italic" style="color:#e5e7eb">"${w.pena_says}"</p>
             <p class="text-xs mono mt-1" style="color:#6b7280">— ${w.cite}</p>
           </div>
+          ${w.gate ? `<p class="text-xs mt-2" style="color:#fca5a5">⏱ Gate that sets the date: ${w.gate}</p>` : ''}
           <p class="text-xs mt-2" style="color:#9ca3af"><span style="color:#60a5fa">Bot:</span> ${w.bot_does}</p>
+          ${w.why_fast ? `<p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#a78bfa">Why it moves fast:</span> ${w.why_fast}</p>` : ''}
           <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#4ade80">You get:</span> ${w.you_get}</p>
           ${blocker}
           <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#fbbf24">Next:</span> ${w.next}</p>
