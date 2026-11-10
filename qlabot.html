@@ -16,7 +16,6 @@
   <style>
     body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
     .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
-    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
     .nav-item { border: 1px solid transparent; transition: all .2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .nav-item:hover { border-color: #fbbf24; background: rgba(251,191,36,.08); color: #fbbf24; }
     .nav-item.active { border-color: #fbbf24; background: rgba(251,191,36,.12); color: #fde68a; }
@@ -25,20 +24,25 @@
     .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
     .btn.on { border-color: #fbbf24; color: #fde68a; background: rgba(251,191,36,.12); }
     .pill { padding: 3px 9px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; display: inline-block; }
+    .p-live { background: rgba(74,222,128,.14); color: #4ade80; border: 1px solid rgba(74,222,128,.35); }
+    .p-waiting { background: rgba(251,191,36,.14); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); }
+    .p-partial { background: rgba(96,165,250,.14); color: #60a5fa; border: 1px solid rgba(96,165,250,.35); }
+    .p-notbuilt { background: rgba(156,163,175,.12); color: #9ca3af; border: 1px solid rgba(156,163,175,.3); }
     .p-built { background: rgba(74,222,128,.14); color: #4ade80; border: 1px solid rgba(74,222,128,.35); }
-    .p-partial { background: rgba(251,191,36,.14); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); }
     .p-planned { background: rgba(156,163,175,.12); color: #9ca3af; border: 1px solid rgba(156,163,175,.3); }
+    .ws { border: 1px solid #2b3444; border-radius: 10px; background: #161b26; }
     .task { border: 1px solid #2b3444; border-radius: 8px; background: #161b26; }
-    .task:hover { border-color: #3f4a5f; }
     .task-body { display: none; }
     .task.open .task-body { display: block; }
     .mono { font-family: 'Courier New', monospace; }
-    details summary { cursor: pointer; }
+    #advanced { display: none; }
+    body.adv #simple { display: none; }
+    body.adv #advanced { display: block; }
   </style>
 </head>
 <body>
   <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background:#111827">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-3 flex-wrap">
       <div class="flex items-center gap-4">
         <a href="/" class="flex items-center gap-2"><span class="text-lg font-bold font-mono tracking-wider" style="color:#fbbf24">LMS</span></a>
         <div class="flex items-center gap-1 flex-wrap">
@@ -49,61 +53,94 @@
           <a href="/loop-master.html" class="nav-item">Loop Master</a>
           <a href="/missions.html" class="nav-item">Missions</a>
           <a href="/kanban.html" class="nav-item">Kanban</a>
-          <a href="/docs.html" class="nav-item">Docs</a>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <a href="/" class="btn btn-ghost">⌂ Home</a>
-        <span class="text-xs font-mono" style="color:#9ca3af">spec v1.0</span>
+      <div class="flex items-center gap-2">
+        <button id="toggle" class="btn btn-ghost" onclick="toggleAdvanced()">⚙ Advanced</button>
+        <span class="text-xs font-mono" style="color:#6b7280">spec v1.0</span>
       </div>
     </div>
   </nav>
 
-  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
-    <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
-      <div>
-        <h1 class="text-2xl font-bold">TANQLABOT</h1>
-        <p class="text-sm" style="color:#9ca3af">Dan Peña QLA deal engine — 80 tasks, every one with an acceptance test</p>
-      </div>
-      <a href="https://github.com/adeola4/TANQLABOT" target="_blank" rel="noopener" class="btn btn-ghost">↗ Private spec repo</a>
-    </div>
+  <main class="px-4 md:px-6 py-6 max-w-6xl mx-auto">
 
-    <div class="panel p-4 mb-5" style="border-color:#7f1d1d; background:linear-gradient(135deg,#2a1414 0%,#1a1113 100%)">
-      <p class="text-xs" style="color:#fca5a5">
-        <strong>This page is the plan, not the engine.</strong> Statuses come from the spec's own tests:
-        <span class="mono">built</span> means code was executed against real input and the test passed;
-        <span class="mono">partial</span> means part of the path is proven and part is blocked;
-        <span class="mono">planned</span> means specified, not yet written.
-        <span style="color:#fbbf24">A task marked <span class="mono">built</span> is not automatically wired into this site</span> — integration is a separate, undecided step.
+    <!-- ═══════════════ SIMPLE VIEW ═══════════════ -->
+    <section id="simple">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold">The nine jobs</h1>
+        <p class="text-sm mt-1" style="color:#9ca3af">What the bot actually does all day. Everything else on this page is detail.</p>
+      </div>
+
+      <div class="panel p-4 mb-5">
+        <div class="text-xs uppercase tracking-wider mb-3" style="color:#9ca3af">Order of work — perfect one layer at a time</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="orderStrip"></div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 mb-4" id="legend"></div>
+
+      <div id="workstreams" class="space-y-3"></div>
+
+      <p class="text-xs mt-5" style="color:#6b7280">
+        Every job above is a projection of the task board — 80 tasks, none unaccounted for. Hit
+        <span class="mono" style="color:#fbbf24">Advanced</span> to see the machinery, the tests, and what's proven.
       </p>
-    </div>
+    </section>
 
-    <div id="totals" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5"></div>
-
-    <div class="panel p-4 mb-4">
-      <div class="flex flex-wrap items-center gap-2" id="phaseFilter"></div>
-      <div class="flex flex-wrap items-center gap-2 mt-2" id="statusFilter"></div>
-    </div>
-
-    <div id="board" class="space-y-6"></div>
-
-    <div class="panel p-5 mt-6">
-      <div class="panel-header"><h2 class="text-sm font-bold uppercase tracking-wider" style="color:#fbbf24">Facelessness — what actually needs a body</h2></div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-        <div class="panel p-3"><div class="text-2xl font-bold" style="color:#4ade80">15</div><p style="color:#9ca3af">QLA steps fully faceless: research, search, kissing frogs, planning, artifacts</p></div>
-        <div class="panel p-3"><div class="text-2xl font-bold" style="color:#fbbf24">6</div><p style="color:#9ca3af">Faceless with approval: LOI price, structure, engagement signatures</p></div>
-        <div class="panel p-3"><div class="text-2xl font-bold" style="color:#f87171">6</div><p style="color:#9ca3af">Genuinely need a body: chairman choice, turf meeting, signing, wires, handover</p></div>
+    <!-- ═══════════════ ADVANCED VIEW ═══════════════ -->
+    <section id="advanced">
+      <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+        <div>
+          <h1 class="text-xl font-bold">Task board <span class="text-sm font-normal" style="color:#6b7280">— the machinery under the nine jobs</span></h1>
+          <p class="text-sm mt-1" style="color:#9ca3af">80 tasks · every one with an acceptance test · built = executed against real input</p>
+        </div>
+        <a href="https://github.com/adeola4/TANQLABOT" target="_blank" rel="noopener" class="btn btn-ghost">↗ Private spec repo</a>
       </div>
-      <p class="text-xs mt-3" style="color:#9ca3af">The 6 are delivered as scheduled items with a one-page brief — not as a to-do list.</p>
-    </div>
+
+      <div class="panel p-3 mb-4" style="border-color:#78350f; background:linear-gradient(135deg,#221708 0%,#1a1410 100%)">
+        <p class="text-xs" style="color:#fcd34d">
+          <span class="mono">built</span> = code ran on real input and its test passed ·
+          <span class="mono">partial</span> = part proven, part blocked ·
+          <span class="mono">planned</span> = specified only.
+          A built task is not automatically wired into this site.
+        </p>
+      </div>
+
+      <div id="totals" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"></div>
+
+      <div class="panel p-4 mb-4">
+        <div class="flex flex-wrap items-center gap-2" id="phaseFilter"></div>
+        <div class="flex flex-wrap items-center gap-2 mt-2" id="statusFilter"></div>
+      </div>
+
+      <div id="board" class="space-y-6"></div>
+
+      <div class="panel p-5 mt-6">
+        <div class="text-sm font-bold uppercase tracking-wider mb-3" style="color:#fbbf24">Facelessness — what actually needs a body</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+          <div class="panel p-3"><div class="text-2xl font-bold" style="color:#4ade80">15</div><p style="color:#9ca3af">QLA steps fully faceless: research, search, kissing frogs, planning, every artifact</p></div>
+          <div class="panel p-3"><div class="text-2xl font-bold" style="color:#fbbf24">6</div><p style="color:#9ca3af">Faceless with approval: LOI price, structure, engagement signatures</p></div>
+          <div class="panel p-3"><div class="text-2xl font-bold" style="color:#f87171">6</div><p style="color:#9ca3af">Genuinely need a body: chairman choice, turf meeting, signing, wires, handover</p></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script>
-    let DATA = null;
-    let fPhase = 'ALL';
-    let fStatus = 'ALL';
+    let TASKS = null, SIMPLE = null;
+    let fPhase = 'ALL', fStatus = 'ALL';
 
+    const WSPILL = { live: 'p-live', waiting: 'p-waiting', partial: 'p-partial', notbuilt: 'p-notbuilt' };
+    const WSLABEL = { live: 'Works today', waiting: 'Waiting on you', partial: 'Half live', notbuilt: 'Not built' };
     const PILL = { built: 'p-built', partial: 'p-partial', planned: 'p-planned' };
+
+    function toggleAdvanced() {
+      const adv = !document.body.classList.contains('adv');
+      document.body.classList.toggle('adv', adv);
+      document.getElementById('toggle').classList.toggle('on', adv);
+      document.getElementById('toggle').textContent = adv ? '◀ Simple view' : '⚙ Advanced';
+      history.replaceState(null, '', adv ? '#advanced' : '#');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     function chip(label, active, onclick) {
       const b = document.createElement('button');
@@ -113,8 +150,41 @@
       return b;
     }
 
+    function renderSimple() {
+      document.getElementById('orderStrip').innerHTML = SIMPLE.order.map(o => `
+        <div class="panel p-3">
+          <div class="text-xs mono mb-1" style="color:#fbbf24">STEP ${o.step}</div>
+          <div class="text-sm font-semibold mb-1">${o.title}</div>
+          <p class="text-xs" style="color:#9ca3af">${o.detail}</p>
+        </div>`).join('');
+
+      document.getElementById('legend').innerHTML = Object.entries(WSLABEL).map(([k, v]) =>
+        `<span class="pill ${WSPILL[k]}">${v}</span>`).join('');
+
+      const wrap = document.getElementById('workstreams');
+      wrap.innerHTML = '';
+      SIMPLE.workstreams.forEach(w => {
+        const el = document.createElement('div');
+        el.className = 'ws p-4';
+        const blocker = w.blocker
+          ? `<p class="text-xs mt-2" style="color:#fbbf24">⚠ Blocked on: ${w.blocker}</p>` : '';
+        el.innerHTML = `
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <span class="mono text-xs" style="color:#6b7280">${w.id}</span>
+            <span class="text-base font-semibold flex-1">${w.name}</span>
+            <span class="pill ${WSPILL[w.status] || 'p-notbuilt'}">${WSLABEL[w.status] || w.status}</span>
+          </div>
+          <p class="text-sm" style="color:#e5e7eb">${w.one_line}</p>
+          <p class="text-xs mt-2" style="color:#9ca3af"><span style="color:#4ade80">You get:</span> ${w.you_get}</p>
+          ${blocker}
+          <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#60a5fa">Next:</span> ${w.next}</p>
+          <p class="text-xs mt-2 mono" style="color:#4b5563">covers ${w.tasks.length} task${w.tasks.length === 1 ? '' : 's'}: ${w.tasks.join(', ')}</p>`;
+        wrap.appendChild(el);
+      });
+    }
+
     function renderTotals() {
-      const t = DATA.totals;
+      const t = TASKS.totals;
       const cards = [
         ['Total tasks', t.tasks, '#f3f4f6'],
         ['Built', t.by_status.built || 0, '#4ade80'],
@@ -129,23 +199,22 @@
     }
 
     function renderFilters() {
-      const pf = document.getElementById('phaseFilter');
-      const sf = document.getElementById('statusFilter');
-      pf.innerHTML = '';
-      sf.innerHTML = '';
+      const pf = document.getElementById('phaseFilter'), sf = document.getElementById('statusFilter');
+      pf.innerHTML = ''; sf.innerHTML = '';
       pf.appendChild(chip('All phases', fPhase === 'ALL', () => { fPhase = 'ALL'; renderFilters(); renderBoard(); }));
-      DATA.phases.forEach(p => {
-        pf.appendChild(chip(`${p.id} · ${p.name.split(' ')[0]}`, fPhase === p.id, () => { fPhase = p.id; renderFilters(); renderBoard(); }));
-      });
-      ['ALL', 'built', 'partial', 'planned'].forEach(s => {
-        sf.appendChild(chip(s === 'ALL' ? 'All statuses' : s, fStatus === s, () => { fStatus = s; renderFilters(); renderBoard(); }));
-      });
+      TASKS.phases.forEach(p => pf.appendChild(chip(`${p.id} · ${p.name.split(' ')[0]}`,
+        fPhase === p.id, () => { fPhase = p.id; renderFilters(); renderBoard(); })));
+      ['ALL', 'built', 'partial', 'planned'].forEach(s => sf.appendChild(
+        chip(s === 'ALL' ? 'All statuses' : s, fStatus === s,
+             () => { fStatus = s; renderFilters(); renderBoard(); })));
     }
 
     function taskEl(t) {
       const d = document.createElement('div');
       d.className = 'task p-3';
-      const body = (t.body || '').replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code class="mono" style="color:#93c5fd">$1</code>');
+      const body = (t.body || '').replace(/\n/g, '<br>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code class="mono" style="color:#93c5fd">$1</code>');
       d.innerHTML = `
         <div class="flex flex-wrap items-center gap-2 cursor-pointer">
           <span class="mono text-xs" style="color:#6b7280">${t.id}</span>
@@ -162,15 +231,14 @@
     function renderBoard() {
       const board = document.getElementById('board');
       board.innerHTML = '';
-      DATA.phases.forEach(p => {
+      TASKS.phases.forEach(p => {
         if (fPhase !== 'ALL' && fPhase !== p.id) return;
         const tasks = p.tasks.filter(t => fStatus === 'ALL' || t.status === fStatus);
         if (!tasks.length) return;
         const sec = document.createElement('section');
-        sec.innerHTML = `
-          <div class="flex items-center justify-between mb-2">
+        sec.innerHTML = `<div class="flex items-center justify-between mb-2">
             <h2 class="text-sm font-bold uppercase tracking-wider" style="color:#fbbf24">${p.id} · ${p.name}</h2>
-            <span class="text-xs mono" style="color:#6b7280">${p.qla ? 'QLA ' + p.qla : ''} · ${tasks.length} shown / ${p.tasks.length}</span>
+            <span class="text-xs mono" style="color:#6b7280">${p.qla ? 'QLA ' + p.qla + ' · ' : ''}${tasks.length} shown / ${p.tasks.length}</span>
           </div>`;
         const list = document.createElement('div');
         list.className = 'space-y-2';
@@ -178,18 +246,20 @@
         sec.appendChild(list);
         board.appendChild(sec);
       });
-      if (!board.children.length) {
-        board.innerHTML = '<p class="text-sm" style="color:#9ca3af">No tasks match this filter.</p>';
-      }
+      if (!board.children.length) board.innerHTML = '<p class="text-sm" style="color:#9ca3af">No tasks match this filter.</p>';
     }
 
-    fetch('/data/tanqlabot_tasks.json')
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(d => { DATA = d; renderTotals(); renderFilters(); renderBoard(); })
-      .catch(e => {
-        document.getElementById('board').innerHTML =
-          `<div class="panel p-4"><p class="text-sm" style="color:#f87171">Could not load <span class="mono">/data/tanqlabot_tasks.json</span> (${e.message}). The board is not rendering invented data — fix the route, then reload.</p></div>`;
-      });
+    Promise.all([
+      fetch('/data/tanqlabot_simple.json').then(r => { if (!r.ok) throw new Error('simple ' + r.status); return r.json(); }),
+      fetch('/data/tanqlabot_tasks.json').then(r => { if (!r.ok) throw new Error('tasks ' + r.status); return r.json(); })
+    ]).then(([s, t]) => {
+      SIMPLE = s; TASKS = t;
+      renderSimple(); renderTotals(); renderFilters(); renderBoard();
+      if (location.hash === '#advanced') toggleAdvanced();
+    }).catch(e => {
+      document.getElementById('workstreams').innerHTML =
+        `<div class="panel p-4"><p class="text-sm" style="color:#f87171">Could not load the board data (${e.message}). Not rendering invented data — fix the route, then reload.</p></div>`;
+    });
   </script>
 </body>
 </html>

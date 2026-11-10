@@ -1,0 +1,107 @@
+{
+  "version": 2,
+  "note": "The front-of-house layer. Nine jobs an operator actually thinks about. Every one maps to task ids in tasks.json — the mapping is the guarantee that the simple view is not a summary written from memory. Validated by scripts/check_workstreams.py: 80/80 covered, no duplicates.",
+  "statuses": {
+    "live": "Works today against real data",
+    "waiting": "Built, waiting on one thing you own",
+    "partial": "Half live — some pieces proven, some not",
+    "notbuilt": "Specified, not built"
+  },
+  "order": [
+    {"step": 1, "title": "Perfect the front nine", "detail": "Get each job below doing its one thing reliably on real deals. Nothing else starts until these are boring."},
+    {"step": 2, "title": "Perfect the back end", "detail": "Then tighten the micro-processes underneath: retries, ledgers, duplicate prevention, audit, cost guards."},
+    {"step": 3, "title": "Make it recursive", "detail": "Then let outcomes feed back into scoring weights, letters, and vertical playbooks so cycle 30 is better than cycle 1."}
+  ],
+  "workstreams": [
+    {
+      "id": "W0",
+      "name": "Runs without you",
+      "one_line": "The engine room: it wakes up daily, refuses to spend money, refuses to send twice, and keeps a log of everything it did.",
+      "you_get": "Today: a daily cycle that runs and reports. Missing: the locks and audit trail that make it safe to leave alone for a month.",
+      "status": "partial",
+      "blocker": null,
+      "next": "Single-flight lock, audit log, dead-letter retry, kill switch. Everything else depends on these being real, so this is first.",
+      "tasks": ["T0.01", "T0.02", "T0.03", "T0.04", "T0.05", "T0.06", "T0.07", "T0.08", "T0.09", "T0.10", "T9.06"]
+    },
+    {
+      "id": "W1",
+      "name": "Find deals",
+      "one_line": "Scans marketplaces and broker firms every morning and turns listings into a clean, complete deal file.",
+      "you_get": "43 listings scanned → 11 ready-to-work deals, 32 flagged with the exact field that's missing.",
+      "status": "live",
+      "blocker": null,
+      "next": "Add two more sources (BizQuest, Flippa) so a slow week on one marketplace doesn't stall the pipeline.",
+      "tasks": ["T1.01", "T1.02", "T1.03", "T1.04", "T1.05", "T1.08"]
+    },
+    {
+      "id": "W2",
+      "name": "Investigate & score",
+      "one_line": "Puts every deal through the QLA test — red flags, the specifics, the local market — then tells you go or no-go.",
+      "you_get": "A 10-factor score with GO/NO-GO, and a refusal to score when the numbers aren't real.",
+      "status": "live",
+      "blocker": "The deep-dive pieces (red flags, lice-comb, market pack) are specified but not built yet",
+      "next": "Build the red-flag sweep and the target profile card, so a score sits on top of evidence instead of a listing headline.",
+      "tasks": ["T1.06", "T1.07", "T1.09", "T1.10", "T1.11", "T1.12", "T5.07"]
+    },
+    {
+      "id": "W3",
+      "name": "Build your court",
+      "one_line": "Finds and writes to the chairman, board, CPA, counsel and banker — plus the moles who tell you the truth about a market.",
+      "you_get": "31 verified people across four roles, every email address live-checked.",
+      "status": "waiting",
+      "blocker": "Your email address + app password (GMAIL_ADDRESS, GMAIL_APP_PASSWORD)",
+      "next": "Once mail is on, send the first wave and track who replies. Mole questions come after the court is warm.",
+      "tasks": ["T2.01", "T2.02", "T2.03", "T2.04", "T2.05", "T2.06", "T2.07", "T2.08", "T2.09", "T2.10", "T3.01", "T3.02", "T3.03", "T3.04", "T3.05"]
+    },
+    {
+      "id": "W4",
+      "name": "Run outreach",
+      "one_line": "Sends the letters by email where published, and fills the contact form where that's all a firm offers.",
+      "you_get": "Two channels from one queue: form filling already proven (9 of 10 fields on a live firm form).",
+      "status": "partial",
+      "blocker": "Email needs the same password as W3; forms work without it",
+      "next": "Approve the first form submission, then the rest can run unattended.",
+      "tasks": ["T4.01", "T4.02", "T4.03", "T4.04", "T4.05", "T4.06", "T4.07", "T4.08", "T1.13", "T1.14"]
+    },
+    {
+      "id": "W5",
+      "name": "Read replies",
+      "one_line": "Reads the inbox, sorts interested from not-interested, matches each reply to the right deal, and moves that deal forward.",
+      "you_get": "Deal status updates you didn't have to touch; anything unclear comes to you labelled REVIEW instead of guessed.",
+      "status": "waiting",
+      "blocker": "Mailbox access (same credentials) — the logic is built and passed its tests",
+      "next": "Run one live week of replies before trusting the classification.",
+      "tasks": ["T5.01", "T5.02", "T5.03", "T5.04", "T5.05", "T5.06"]
+    },
+    {
+      "id": "W6",
+      "name": "Do the paperwork",
+      "one_line": "Drafts the LOI, tests the 1.5x coverage rule, structures the seller note, assembles the contract pack, then runs the closing checklist.",
+      "you_get": "A 2,200-word LOI and a coverage test with the arithmetic shown — and a hard refusal if a money figure was guessed.",
+      "status": "live",
+      "blocker": "Closing plan and transition plan are specified, not built",
+      "next": "Attach the diligence checklist so an LOI can't go out before documents are in.",
+      "tasks": ["T6.01", "T6.02", "T6.03", "T6.04", "T6.05", "T6.06", "T6.07", "T6.08", "T6.09", "T6.10", "T7.01", "T7.02", "T7.03"]
+    },
+    {
+      "id": "W7",
+      "name": "Book your time",
+      "one_line": "Collects everything that genuinely needs a human into one queue, with a brief and a proposed time.",
+      "you_get": "A short list of calendar items — who to call, why now, the three questions, how long it takes.",
+      "status": "partial",
+      "blocker": null,
+      "next": "Decide calendar: keep sending .ics files to Drive, or re-authorise the token for real calendar writes.",
+      "tasks": ["T5.08", "T9.01", "T9.02", "T9.03", "T9.04", "T9.05"]
+    },
+    {
+      "id": "W8",
+      "name": "Learn from every deal",
+      "one_line": "Records why each deal lived or died and feeds that back into the scoring and the letters.",
+      "you_get": "Nothing yet — this is the loop that makes the system improve instead of repeat.",
+      "status": "notbuilt",
+      "blocker": "Needs outcome data, which needs W1–W6 running for a few weeks",
+      "next": "Log outcomes from day one so the data exists when this gets built.",
+      "tasks": ["T8.01", "T8.02", "T8.03", "T8.04", "T8.05", "T7.04"]
+    }
+  ]
+}
