@@ -1,9 +1,9 @@
 {
-  "version": 5,
+  "version": 6,
   "source": {
     "primary": "qla_usb_slides_full.txt — QLA Castle Seminar slides",
     "detail": "SOURCE_MAP.md",
-    "note": "The buying sequence, verbatim from slide 1586 (120-day timeline) and slide 1862 (11 Step Action Plan) — then RE-TIMED. Pena's 120 days measured human throughput: one person, one task at a time, by phone and post. The steps and their order are his. The clock is ours."
+    "note": "The buying sequence, verbatim from slide 1586 and slide 1862 — then stripped of every date. Pena's windows were one man's throughput; this is a volume system. Each card states its cadence, its output per run, and the one thing that caps the multiple. Dates appear only inside Pena's verbatim quotes, because that is what he wrote. Nothing the build commits to is expressed in time."
   },
   "statuses": {
     "live": "Works today against real data",
@@ -15,24 +15,23 @@
   "order": [
     {
       "step": 1,
-      "title": "Peña's order, our clock",
-      "detail": "Twelve steps in his sequence. The 120 days were his throughput, not the work: he did one thing at a time, in person. Run the lanes in parallel and the machine half collapses to hours."
+      "title": "No clock, only volume",
+      "detail": "Twelve steps in Pena's order, each one a lane that runs as often as the system can. A date is a promise someone else has to keep; a rate is a thing you control. Where his quotes contain days, they are quoted, not adopted."
     },
     {
       "step": 2,
-      "title": "The floor that does not move",
-      "detail": "Chairman replies, counsel's letter, a seller's disclosure, a lender's credit call, and trust before a mole talks. Fourteen days is machine work plus one human round-trip — not a promise of a closed deal."
+      "title": "The ceiling moves to supply",
+      "detail": "Once hours stop binding, what caps the multiple is other people: sellers willing to disclose, chairmen worth asking, lenders with appetite, a mailbox that stays alive. Output is bought with breadth, never with speed."
     },
     {
       "step": 3,
       "title": "Then make it recursive",
-      "detail": "Every reply, verdict and outcome feeds scoring, letters and vertical playbooks so run 30 is better than run 1. The only thing that scales the floor down is better targeting, not faster software."
+      "detail": "Every reply, verdict and outcome feeds scoring, letters and vertical playbooks, so run 30 beats run 1 at the same cost. That is the only curve that matters here."
     }
   ],
   "workstreams": [
     {
       "id": "1",
-      "window": "Day 0–1",
       "name": "Pick the industry",
       "pena_says": "QLA COMPLETION TIMELINE: INDUSTRY & IDEA, PLUS ANCHOR CHAIRMAN IN 1ST 30 DAYS",
       "cite": "slide 1586 · step 1 of the 11 Step Action Plan, slide 1862: \"Identify the idea\"",
@@ -48,12 +47,12 @@
         "T1.04",
         "T1.05"
       ],
-      "gate": "Nothing. The sweep runs on its own.",
-      "why_fast": "Peña's own record for steps 1–2 was 37 days (slide 1586) because a man had to read listings one at a time. The pipeline sweeps every marketplace and firm site in one cycle."
+      "cadence": "Every cycle",
+      "output_per_run": "Every listed business across every source, swept and scored; verticals normalised; every reject carrying a code.",
+      "ceiling": "Source coverage — nothing else. Every source added raises the multiple immediately."
     },
     {
       "id": "2",
-      "window": "Day 0–1",
       "name": "Write the idea down",
       "pena_says": "1. Identify the idea",
       "cite": "slide 1862 · on precision: slide 1025 \"II Clarify your vision\"",
@@ -68,12 +67,12 @@
         "T1.08",
         "T1.09"
       ],
-      "gate": "Nothing — the buy-box is yours to change, not to approve.",
-      "why_fast": "43 listings → 43 deal files → 11 walker-ready already happened in a single afternoon. The 7-field file and the 10-factor score are machine work."
+      "cadence": "Every cycle",
+      "output_per_run": "43 listings → 43 deal files → 11 walker-ready, per sweep. Repeats as often as the sweep runs.",
+      "ceiling": "Disclosure quality: 32 of 43 die on a missing EBITDA. Unblock asks raise the ceiling; speed does not."
     },
     {
       "id": "3",
-      "window": "Day 1–4",
       "name": "Anchor the chairman",
       "pena_says": "INDUSTRY & IDEA, PLUS ANCHOR CHAIRMAN IN 1ST 30 DAYS",
       "cite": "slide 1586 · step 6 of the seven steps: \"IV Creating your Dream Team\", slide 1025",
@@ -82,17 +81,17 @@
       "you_get": "A named, verified candidate list with a written ask per person — plus the honest gap: the chairman conversation is the one thing Peña kissed frogs over himself.",
       "status": "waiting",
       "blocker": "Your email address + app password (GMAIL_ADDRESS, GMAIL_APP_PASSWORD) to send the approaches",
-      "next": "Send the first wave the day mail is on; the court tracker then shows which seats are filled.",
+      "next": "Send the first wave as soon as mail is on; the court tracker then shows which seats are filled.",
       "tasks": [
         "T2.01",
         "T2.02"
       ],
-      "gate": "Chairman replies. 20–30% answer inside a week; the rest are silence, not refusal.",
-      "why_fast": "Sourcing and verification are day 1. Everything after this waits on a heavyweight's inbox — the one clock a bot cannot shorten, only parallelise (40 candidates instead of 4 sequential calls)."
+      "cadence": "Every court build",
+      "output_per_run": "40+ verified chairman candidates sourced and approached in one cycle, not one call at a time.",
+      "ceiling": "Reply rate, 20–30% a wave. Volume is the lever — send more waves to more candidates, not faster emails."
     },
     {
       "id": "4",
-      "window": "Day 1–4",
       "name": "Build the board",
       "pena_says": "REMAINING DREAM TEAM BOARD MEMBERS, INCLUDING LAWYER, ACCOUNTANT, INDUSTRY EXPERT (S) IN 2ND 30 DAYS",
       "cite": "slide 1586",
@@ -105,12 +104,12 @@
       "tasks": [
         "T2.03"
       ],
-      "gate": "Same inboxes as the chairman — run simultaneously, not after him.",
-      "why_fast": "Peña sequenced the board after the chairman because one man cannot court twelve people at once. The bot can: all seats approached in the same cycle."
+      "cadence": "Every court build",
+      "output_per_run": "All remaining seats approached in the same cycle as the chairman, verified first.",
+      "ceiling": "Credible names in the vertical — the supply of people worth asking, not the asking."
     },
     {
       "id": "5",
-      "window": "Day 2–6",
       "name": "Retain the lawyer",
       "pena_says": "INCLUDING LAWYER ... IN 2ND 30 DAYS",
       "cite": "slide 1586 · step 9 of the seven steps, slide 1025",
@@ -123,12 +122,12 @@
       "tasks": [
         "T2.05"
       ],
-      "gate": "Counsel's engagement letter — the slowest human artifact in the whole run.",
-      "why_fast": "Firm targeting and the partner-level approach are machine work. Conflicts check and engagement letter are the gate; do not plan a signing around a same-day retainer."
+      "cadence": "Every court build",
+      "output_per_run": "3 verified counsel firms at partner level per build.",
+      "ceiling": "Firm conflicts and front-desk-only publishing. Law firms hide the partner; the reply is the introduction."
     },
     {
       "id": "6",
-      "window": "Day 2–6",
       "name": "Retain the accountant",
       "pena_says": "INCLUDING ... ACCOUNTANT ... IN 2ND 30 DAYS",
       "cite": "slide 1586 · step 8 of the seven steps, slide 1025",
@@ -141,30 +140,30 @@
       "tasks": [
         "T2.04"
       ],
-      "gate": "Accountant's engagement letter.",
-      "why_fast": "Same engine as counsel. Realistically the fastest of the professionals to answer because the ask is small."
+      "cadence": "Every court build",
+      "output_per_run": "5 verified accountant targets per build, named partners where published.",
+      "ceiling": "Named-partner publication. Same engine as counsel, cheaper ask, faster answer."
     },
     {
       "id": "7",
-      "window": "Day 2–6",
       "name": "Recruit industry experts",
       "pena_says": "INDUSTRY EXPERT (S) IN 2ND 30 DAYS",
-      "cite": "slide 1586 — named in the same 30-day window as counsel and the accountant",
+      "cite": "slide 1586 — named in the same window as counsel and the accountant",
       "one_line": "Two or three operators who have run or sold companies in this exact vertical.",
       "bot_does": "Nothing yet — this task did not exist on the board until the timeline named it. Sourcing and approach would reuse the same engine as the chairman.",
-      "you_get": "Honest gap: the source requires them before day 60, and the board had no task for it. It has one now (T2.11).",
+      "you_get": "Honest gap: the source requires them before the offer stage, and the board had no task for it. It has one now (T2.11).",
       "status": "notbuilt",
       "blocker": "Not built — added to the board this round",
       "next": "Clone the chairman sourcing path onto a vertical-expert query; the credentials are already the only blocker.",
       "tasks": [
         "T2.11"
       ],
-      "gate": "Experts answer as operators, not firms — usually faster than counsel.",
-      "why_fast": "Sourcing reuses the chairman path with a vertical-expert query. Not built yet (T2.11), so today this lane is empty."
+      "cadence": "Every court build",
+      "output_per_run": "Not built yet (T2.11). Reuses the chairman path with a vertical-expert query — same volume from its first run.",
+      "ceiling": "Nothing structural. This lane is empty today, and the sequence says it is required."
     },
     {
       "id": "8",
-      "window": "Day 2–8",
       "name": "Place your moles",
       "pena_says": "Not traceable to the slide deck — moles come from chapter 6 of the book.",
       "cite": "chapter 6 action items in YF100M_FORENSIC_MANUAL.md; explicitly NOT found in qla_usb_slides_full.txt",
@@ -181,12 +180,12 @@
         "T3.04",
         "T3.05"
       ],
-      "gate": "A mole has to trust you first — this is the least compressible step on the board.",
-      "why_fast": "Non-transactional by definition: reciprocity before the ask. A bot can keep the ledger and the question bank; it cannot manufacture trust in a week."
+      "cadence": "Per market",
+      "output_per_run": "Specified: candidate ID, non-transactional approach, question bank, answer ledger, reciprocity ledger.",
+      "ceiling": "Trust. This is the one step that cannot be volume-produced — a mole talks because of who you are, not how many you emailed."
     },
     {
       "id": "9",
-      "window": "Day 1–continuous",
       "name": "Approach them all",
       "pena_says": "7. Action plan (you & other decision makers) a. Get others obsessed b. Walk your talk (never ever share doubt)",
       "cite": "slide 1862 · on persistence: slide 2158 — \"You must kiss a lot of frogs! Period!\"",
@@ -218,16 +217,16 @@
         "T5.07",
         "T5.08"
       ],
-      "gate": "Replies, at human speed. The letters are instant; the answers are not.",
-      "why_fast": "31 verified advisors, 6 addressed letters, one live form filled — all staged in a day. Sending is gated on the mail credentials, and replies arrive on other people's schedules."
+      "cadence": "Continuous",
+      "output_per_run": "31 verified advisors across four roles; 6 addressed letters staged for one deal; one live form filled end to end with a kept screenshot.",
+      "ceiling": "Mailbox reputation. Rate limits, bounce handling and opt-out are the hard wall — a hard cap on touches per domain, enforced in the ledger."
     },
     {
       "id": "10",
-      "window": "Day 3–9",
       "name": "Warm the money",
       "pena_says": "FINANCIAL INSTITUTIONS: BANKS, INSURANCE CO'S, PE, ETC, WARMED UP & READY 2 ACCEPT 1ST DEAL IN 3RD 30 DAYS",
       "cite": "slide 1586 · steps 21–22 of the walker: lender and banker targeting",
-      "one_line": "Lenders opened before the first LOI exists, so the offer is fundable the day it is made.",
+      "one_line": "Lenders opened before the first LOI exists, so the offer is fundable when it is made.",
       "bot_does": "Targets lenders and bankers at deal size, verifies addresses, writes the ask — what they lend against, what they require personally guaranteed.",
       "you_get": "6 verified lender targets including the regional development company that lends at this size. No LOI will be drafted against zero warmed lenders once T2.12 is built.",
       "status": "waiting",
@@ -237,12 +236,12 @@
         "T2.06",
         "T2.12"
       ],
-      "gate": "Lender appetite — a credit officer's calendar, not ours.",
-      "why_fast": "Peña put the banks at day 90 because he had no target until then. A bot has a pipeline on day 1, so the warm-up starts at day 3 with the real deal window stated instead of a hypothetical."
+      "cadence": "Per deal",
+      "output_per_run": "6 verified lender targets at deal size, approached with the actual deal window stated, before any LOI exists.",
+      "ceiling": "Lender appetite at your size. Offset by breadth: more lenders opened, not a faster application."
     },
     {
       "id": "11",
-      "window": "Day 4–10",
       "name": "Investigate, search, kiss frogs",
       "pena_says": "2. Investigate generalities · 3. Investigate specifics · 6. Investigate continues",
       "cite": "slides 1862 and 2158 · \"Investigation is a search for red flags\" (YF100M_FORENSIC_MANUAL.md)",
@@ -261,12 +260,12 @@
         "T1.13",
         "T1.14"
       ],
-      "gate": "The seller's willingness to disclose numbers. NDA → statements is the longest silence in the deal.",
-      "why_fast": "The red-flag sweep and the local intel pack are minutes of machine work. What takes days is a seller deciding to send financials to a stranger."
+      "cadence": "Per deal × every open deal",
+      "output_per_run": "Red-flag sweep and local intel pack in minutes; scoring on 10 factors; search letters and the kiss-frogs loop on everything that survives.",
+      "ceiling": "Seller disclosure speed. Only offset is running many deals in parallel instead of waiting on one."
     },
     {
       "id": "12",
-      "window": "Day 10–14",
       "name": "Offer, close, get paid",
       "pena_says": "MAKE AN OFFER IN THE 4TH 30 DAYS, OR TOTAL OF 120 DAYS",
       "cite": "slide 1586 · steps 8–11 of the 11 Step Action Plan, slide 1862: critical path → implementation → execution → re-evaluation",
@@ -297,18 +296,18 @@
         "T8.04",
         "T8.05"
       ],
-      "gate": "Seller's signature, counsel's review, and the lender's credit decision — three human clocks in series.",
-      "why_fast": "The LOI draft, the structures, the 1.5x coverage test and the contract pack are same-day machine work. The offer itself can go out on day 14; a closed deal cannot."
+      "cadence": "Per deal",
+      "output_per_run": "LOI draft, three alternative structures, seller note, the 1.5x coverage test and the contract pack — one session per target.",
+      "ceiling": "Signatures, counsel review, credit decisions. Run ten deals to get ten signatures; one deal cannot move faster than its counterparties."
     },
     {
       "id": "ENGINE",
-      "window": "Continuous",
       "name": "The engine room — not in the source",
       "pena_says": "Not in the source. This is the machine that runs the twelve, and it is labelled as ours.",
       "cite": "our own requirement",
       "one_line": "It wakes daily, refuses to spend money, refuses to send twice, and keeps a log of everything it did.",
       "bot_does": "Schedules the cycle, gates credentials, stamps provenance, and (once built) holds single-flight locks, an audit log, dead-letter retry and a kill switch.",
-      "you_get": "Today: a daily cycle that runs and reports, plus the needs-you queue and the digest. Missing: the locks and audit trail that make it safe to leave alone for a month.",
+      "you_get": "Today: a cycle that runs, reports, and queues what needs you. Missing: the locks and audit trail that make it safe to run unattended.",
       "status": "partial",
       "blocker": null,
       "next": "Single-flight lock, audit log, dead-letter retry, kill switch — every other step's honesty depends on these.",
@@ -330,8 +329,9 @@
         "T9.05",
         "T9.06"
       ],
-      "gate": "Nothing — but it is what makes 14 days safe rather than reckless.",
-      "why_fast": "The locks, audit log and kill switch (T0.04, T0.07, T0.08, T0.09) are what let a run this fast be trusted unattended. Without them, speed is just a bigger blast radius."
+      "cadence": "Always on",
+      "output_per_run": "A cycle that wakes, sweeps, stages, reads and reports — repeatedly, without you.",
+      "ceiling": "The locks and audit trail (T0.04, T0.07–T0.09). Without them, volume stops being output and becomes blast radius."
     }
   ]
 }

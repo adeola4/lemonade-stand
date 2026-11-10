@@ -69,8 +69,8 @@
     <!-- ═══════════════ SIMPLE VIEW ═══════════════ -->
     <section id="simple">
       <div class="mb-5">
-        <h1 class="text-2xl font-bold">The QLA buying sequence — 14 days</h1>
-        <p class="text-sm mt-1" style="color:#9ca3af">The twelve steps, in Peña's order, re-timed. His 120 days (slide 1586) measured a man doing one thing at a time by phone and post; the 11 Step Action Plan is slide 1862. The sequence is his — the clock is ours: same lanes, run in parallel, and the machine half collapses to hours. Each card shows the step, the verbatim line, the slide, and the human gate that actually sets the date.</p>
+        <h1 class="text-2xl font-bold">The QLA buying sequence — maximum output, no clock</h1>
+        <p class="text-sm mt-1" style="color:#9ca3af">The twelve steps, in Peña's order, with every date removed. His windows (slide 1586) measured one man's throughput; the 11 Step Action Plan is slide 1862. Each card shows the step, the verbatim line, the slide, how often it runs, what one run produces, and the single thing that caps the multiple. Days appear only inside his quotes, because that is what he wrote — nothing the build commits to is expressed in time.</p>
       </div>
 
       <div class="panel p-4 mb-5">
@@ -175,7 +175,7 @@
         el.innerHTML = `
           <div class="flex flex-wrap items-center gap-2 mb-1">
             <span class="mono text-xs" style="color:#6b7280">${w.id}</span>
-            ${w.window ? `<span class="pill" style="background:#1e293b;color:#93c5fd;border:1px solid #1e40af">${w.window}</span>` : ''}
+            ${w.cadence ? `<span class="pill" style="background:#1e293b;color:#93c5fd;border:1px solid #1e40af">${w.cadence}</span>` : ''}
             <span class="text-base font-semibold flex-1">${w.name}</span>
             <span class="pill ${WSPILL[w.status] || 'p-notbuilt'}">${WSLABEL[w.status] || w.status}</span>
           </div>
@@ -184,9 +184,9 @@
             <p class="text-xs italic" style="color:#e5e7eb">"${w.pena_says}"</p>
             <p class="text-xs mono mt-1" style="color:#6b7280">— ${w.cite}</p>
           </div>
-          ${w.gate ? `<p class="text-xs mt-2" style="color:#fca5a5">⏱ Gate that sets the date: ${w.gate}</p>` : ''}
+          ${w.output_per_run ? `<p class="text-xs mt-2" style="color:#4ade80">↻ Per run: ${w.output_per_run}</p>` : ''}
           <p class="text-xs mt-2" style="color:#9ca3af"><span style="color:#60a5fa">Bot:</span> ${w.bot_does}</p>
-          ${w.why_fast ? `<p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#a78bfa">Why it moves fast:</span> ${w.why_fast}</p>` : ''}
+          ${w.ceiling ? `<p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#fca5a5">Capped by:</span> ${w.ceiling}</p>` : ''}
           <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#4ade80">You get:</span> ${w.you_get}</p>
           ${blocker}
           <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#fbbf24">Next:</span> ${w.next}</p>
