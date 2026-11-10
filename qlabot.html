@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS // TANQLABOT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { lms: { bg: '#111827', panel: '#1f2937', border: '#374151', amber: '#fbbf24', glow: '#fde68a', green: '#4ade80', red: '#f87171', blue: '#60a5fa', muted: '#9ca3af' } },
+        fontFamily: { mono: ['Courier New', 'monospace'] }
+      } }
+    }
+  </script>
+  <style>
+    body { background: #111827; color: #f3f4f6; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    .panel { background: linear-gradient(135deg, #1f2937 0%, #1a1f2e 100%); border: 1px solid #374151; border-radius: 10px; }
+    .panel-header { border-bottom: 1px solid #374151; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+    .nav-item { border: 1px solid transparent; transition: all .2s; color: #9ca3af; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item:hover { border-color: #fbbf24; background: rgba(251,191,36,.08); color: #fbbf24; }
+    .nav-item.active { border-color: #fbbf24; background: rgba(251,191,36,.12); color: #fde68a; }
+    .btn { padding: 7px 14px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; border: 1px solid transparent; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost { background: transparent; color: #9ca3af; border-color: #374151; }
+    .btn-ghost:hover { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+    .btn.on { border-color: #fbbf24; color: #fde68a; background: rgba(251,191,36,.12); }
+    .pill { padding: 3px 9px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; display: inline-block; }
+    .p-built { background: rgba(74,222,128,.14); color: #4ade80; border: 1px solid rgba(74,222,128,.35); }
+    .p-partial { background: rgba(251,191,36,.14); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); }
+    .p-planned { background: rgba(156,163,175,.12); color: #9ca3af; border: 1px solid rgba(156,163,175,.3); }
+    .task { border: 1px solid #2b3444; border-radius: 8px; background: #161b26; }
+    .task:hover { border-color: #3f4a5f; }
+    .task-body { display: none; }
+    .task.open .task-body { display: block; }
+    .mono { font-family: 'Courier New', monospace; }
+    details summary { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 backdrop-blur-sm border-b border-lms-border px-4 md:px-6 py-3" style="background:#111827">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2"><span class="text-lg font-bold font-mono tracking-wider" style="color:#fbbf24">LMS</span></a>
+        <div class="flex items-center gap-1 flex-wrap">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/deals.html" class="nav-item">Deals</a>
+          <a href="/qla.html" class="nav-item">QLA Bot</a>
+          <a href="/qlabot.html" class="nav-item active">TANQLABOT</a>
+          <a href="/loop-master.html" class="nav-item">Loop Master</a>
+          <a href="/missions.html" class="nav-item">Missions</a>
+          <a href="/kanban.html" class="nav-item">Kanban</a>
+          <a href="/docs.html" class="nav-item">Docs</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/" class="btn btn-ghost">⌂ Home</a>
+        <span class="text-xs font-mono" style="color:#9ca3af">spec v1.0</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+    <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">TANQLABOT</h1>
+        <p class="text-sm" style="color:#9ca3af">Dan Peña QLA deal engine — 80 tasks, every one with an acceptance test</p>
+      </div>
+      <a href="https://github.com/adeola4/TANQLABOT" target="_blank" rel="noopener" class="btn btn-ghost">↗ Private spec repo</a>
+    </div>
+
+    <div class="panel p-4 mb-5" style="border-color:#7f1d1d; background:linear-gradient(135deg,#2a1414 0%,#1a1113 100%)">
+      <p class="text-xs" style="color:#fca5a5">
+        <strong>This page is the plan, not the engine.</strong> Statuses come from the spec's own tests:
+        <span class="mono">built</span> means code was executed against real input and the test passed;
+        <span class="mono">partial</span> means part of the path is proven and part is blocked;
+        <span class="mono">planned</span> means specified, not yet written.
+        <span style="color:#fbbf24">A task marked <span class="mono">built</span> is not automatically wired into this site</span> — integration is a separate, undecided step.
+      </p>
+    </div>
+
+    <div id="totals" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5"></div>
+
+    <div class="panel p-4 mb-4">
+      <div class="flex flex-wrap items-center gap-2" id="phaseFilter"></div>
+      <div class="flex flex-wrap items-center gap-2 mt-2" id="statusFilter"></div>
+    </div>
+
+    <div id="board" class="space-y-6"></div>
+
+    <div class="panel p-5 mt-6">
+      <div class="panel-header"><h2 class="text-sm font-bold uppercase tracking-wider" style="color:#fbbf24">Facelessness — what actually needs a body</h2></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+        <div class="panel p-3"><div class="text-2xl font-bold" style="color:#4ade80">15</div><p style="color:#9ca3af">QLA steps fully faceless: research, search, kissing frogs, planning, artifacts</p></div>
+        <div class="panel p-3"><div class="text-2xl font-bold" style="color:#fbbf24">6</div><p style="color:#9ca3af">Faceless with approval: LOI price, structure, engagement signatures</p></div>
+        <div class="panel p-3"><div class="text-2xl font-bold" style="color:#f87171">6</div><p style="color:#9ca3af">Genuinely need a body: chairman choice, turf meeting, signing, wires, handover</p></div>
+      </div>
+      <p class="text-xs mt-3" style="color:#9ca3af">The 6 are delivered as scheduled items with a one-page brief — not as a to-do list.</p>
+    </div>
+  </main>
+
+  <script>
+    let DATA = null;
+    let fPhase = 'ALL';
+    let fStatus = 'ALL';
+
+    const PILL = { built: 'p-built', partial: 'p-partial', planned: 'p-planned' };
+
+    function chip(label, active, onclick) {
+      const b = document.createElement('button');
+      b.className = 'btn btn-ghost' + (active ? ' on' : '');
+      b.textContent = label;
+      b.onclick = onclick;
+      return b;
+    }
+
+    function renderTotals() {
+      const t = DATA.totals;
+      const cards = [
+        ['Total tasks', t.tasks, '#f3f4f6'],
+        ['Built', t.by_status.built || 0, '#4ade80'],
+        ['Partial', t.by_status.partial || 0, '#fbbf24'],
+        ['Planned', t.by_status.planned || 0, '#9ca3af'],
+      ];
+      document.getElementById('totals').innerHTML = cards.map(([k, v, c]) => `
+        <div class="panel p-4">
+          <div class="text-xs uppercase tracking-wider" style="color:#9ca3af">${k}</div>
+          <div class="text-3xl font-bold mono" style="color:${c}">${v}</div>
+        </div>`).join('');
+    }
+
+    function renderFilters() {
+      const pf = document.getElementById('phaseFilter');
+      const sf = document.getElementById('statusFilter');
+      pf.innerHTML = '';
+      sf.innerHTML = '';
+      pf.appendChild(chip('All phases', fPhase === 'ALL', () => { fPhase = 'ALL'; renderFilters(); renderBoard(); }));
+      DATA.phases.forEach(p => {
+        pf.appendChild(chip(`${p.id} · ${p.name.split(' ')[0]}`, fPhase === p.id, () => { fPhase = p.id; renderFilters(); renderBoard(); }));
+      });
+      ['ALL', 'built', 'partial', 'planned'].forEach(s => {
+        sf.appendChild(chip(s === 'ALL' ? 'All statuses' : s, fStatus === s, () => { fStatus = s; renderFilters(); renderBoard(); }));
+      });
+    }
+
+    function taskEl(t) {
+      const d = document.createElement('div');
+      d.className = 'task p-3';
+      const body = (t.body || '').replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code class="mono" style="color:#93c5fd">$1</code>');
+      d.innerHTML = `
+        <div class="flex flex-wrap items-center gap-2 cursor-pointer">
+          <span class="mono text-xs" style="color:#6b7280">${t.id}</span>
+          <span class="text-sm font-semibold flex-1">${t.title}</span>
+          <span class="pill ${PILL[t.status] || 'p-planned'}">${t.status}</span>
+          <span class="text-xs mono" style="color:#9ca3af">${t.channel || '—'}</span>
+          <span class="text-xs" style="color:${/^yes/.test(t.human) ? '#f87171' : '#4ade80'}">human: ${t.human || 'no'}</span>
+        </div>
+        <div class="task-body mt-2 text-xs" style="color:#cbd5e1">${body || '<em>no detail lines</em>'}</div>`;
+      d.querySelector('.cursor-pointer').onclick = () => d.classList.toggle('open');
+      return d;
+    }
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+      DATA.phases.forEach(p => {
+        if (fPhase !== 'ALL' && fPhase !== p.id) return;
+        const tasks = p.tasks.filter(t => fStatus === 'ALL' || t.status === fStatus);
+        if (!tasks.length) return;
+        const sec = document.createElement('section');
+        sec.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm font-bold uppercase tracking-wider" style="color:#fbbf24">${p.id} · ${p.name}</h2>
+            <span class="text-xs mono" style="color:#6b7280">${p.qla ? 'QLA ' + p.qla : ''} · ${tasks.length} shown / ${p.tasks.length}</span>
+          </div>`;
+        const list = document.createElement('div');
+        list.className = 'space-y-2';
+        tasks.forEach(t => list.appendChild(taskEl(t)));
+        sec.appendChild(list);
+        board.appendChild(sec);
+      });
+      if (!board.children.length) {
+        board.innerHTML = '<p class="text-sm" style="color:#9ca3af">No tasks match this filter.</p>';
+      }
+    }
+
+    fetch('/data/tanqlabot_tasks.json')
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(d => { DATA = d; renderTotals(); renderFilters(); renderBoard(); })
+      .catch(e => {
+        document.getElementById('board').innerHTML =
+          `<div class="panel p-4"><p class="text-sm" style="color:#f87171">Could not load <span class="mono">/data/tanqlabot_tasks.json</span> (${e.message}). The board is not rendering invented data — fix the route, then reload.</p></div>`;
+      });
+  </script>
+</body>
+</html>

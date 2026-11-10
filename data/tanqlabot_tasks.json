@@ -1,0 +1,804 @@
+{
+  "generated_from": "TASKS.md",
+  "totals": {
+    "tasks": 80,
+    "by_status": {
+      "built": 25,
+      "partial": 17,
+      "planned": 38
+    },
+    "phases": 10
+  },
+  "phases": [
+    {
+      "id": "P0",
+      "name": "FOUNDATION",
+      "qla": "",
+      "tasks": [
+        {
+          "id": "T0.01",
+          "title": "Single state root and ledger schema",
+          "phase": "P0",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** nothing\n- **Do** create `state/` tree; four stores (`prospects.db`, `outreach.db`, `walker/`, `tasks/`) with explicit schemas\n- **Out** migrations that run idempotently on every boot\n- **Test** run boot twice \u2192 no duplicate tables, no data loss, `state/` tree matches the documented layout\n"
+        },
+        {
+          "id": "T0.02",
+          "title": "Credential gate that refuses instead of degrading",
+          "phase": "P0",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** `~/.hermes/.env`\n- **Do** read every credential the run needs before it starts; if any is missing, name the variable and stop that channel\n- **Out** per-channel readiness map in the run header\n- **Test** unset `GMAIL_ADDRESS` \u2192 email channel reports `blocked: GMAIL_ADDRESS`, form channel still runs\n"
+        },
+        {
+          "id": "T0.03",
+          "title": "Zero-spend guard",
+          "phase": "P0",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** every outbound call\n- **Do** refuse any external call with a price tag; maintain an allowlist of free endpoints\n- **Out** `state/reports/spend.json` = 0.00 always\n- **Test** inject a paid API base URL \u2192 call is rejected before the request leaves the box\n"
+        },
+        {
+          "id": "T0.04",
+          "title": "Single-flight lock per target",
+          "phase": "P0",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** target id\n- **Do** acquire lock before any outbound; release on completion; expire stale locks after 6h\n- **Out** lock table\n- **Test** two concurrent cycles \u2192 exactly one send per target, second exits `already_in_flight`\n"
+        },
+        {
+          "id": "T0.05",
+          "title": "Idempotency key on every external action",
+          "phase": "P0",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** (target, channel, artifact hash)\n- **Do** derive a key; refuse a second send of the same key within 30 days\n- **Out** `outreach.db.sends.key` unique index\n- **Test** re-run the staging batch \u2192 0 new sends, N skipped as duplicates\n"
+        },
+        {
+          "id": "T0.06",
+          "title": "Provenance stamping",
+          "phase": "P0",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** every parsed fact\n- **Do** attach `{value, source, confidence, stamp}` with stamp \u2208 `verified | inferred | assumed`\n- **Out** provenance-bearing JSON for all deal fields\n- **Test** any spec containing an `assumed` money field is refused by the LOI generator\n"
+        },
+        {
+          "id": "T0.07",
+          "title": "Audit log for external effects",
+          "phase": "P0",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** every send / submission / file written outside `state/`\n- **Do** append an immutable line: timestamp, target, channel, artifact hash, verdict, evidence path\n- **Out** `state/audit.log` (append-only)\n- **Test** `audit.log` line count equals sum of `sends + submissions` tables for any given day\n"
+        },
+        {
+          "id": "T0.08",
+          "title": "Dead-letter queue with classified retry",
+          "phase": "P0",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** failed task\n- **Do** classify failure as `transient | blocked | fatal`; retry transient up to 3 with backoff; escalate the rest\n- **Out** `state/dlq/` + retry schedule\n- **Test** simulate 403 \u2192 classified `blocked`, retried twice, then escalated with the exact URL\n"
+        },
+        {
+          "id": "T0.09",
+          "title": "Kill switch",
+          "phase": "P0",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** a file flag or a single command\n- **Do** halt all outbound within one cycle without losing state\n- **Out** run marked `halted`, partially completed work committed\n- **Test** set the flag mid-cycle \u2192 no sends after the flag timestamp\n"
+        },
+        {
+          "id": "T0.10",
+          "title": "Daily cycle scheduler",
+          "phase": "P0",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** cron/systemd timer\n- **Do** the 06:00 cycle: scan \u2192 spec \u2192 stage \u2192 send \u2192 inbox \u2192 digest\n- **Out** `state/reports/cycle-<date>.md`\n- **Test** two consecutive unattended cycles produce two distinct reports and no duplicate sends\n"
+        }
+      ]
+    },
+    {
+      "id": "P1",
+      "name": "TARGET DISCOVERY",
+      "qla": "QLA 11 \u00b7 12 \u00b7 13 \u00b7 17",
+      "tasks": [
+        {
+          "id": "T1.01",
+          "title": "Source scan: marketplaces",
+          "phase": "P1",
+          "status": "built",
+          "channel": "market",
+          "human": "no",
+          "body": "- **In** BizBuySell / BizQuest / Flippa / BizBen search URLs\n- **Do** stealth-browser page loads, batch of 8\u201310 per source; treat short dumps as `refetch`, not `unavailable`\n- **Out** `state/listings/*.txt` immutable dumps\n- **Test** \u226590% of requested pages yield >800 chars; every short dump carries a `refetch` marker\n"
+        },
+        {
+          "id": "T1.02",
+          "title": "Source scan: firm sites and off-market signals",
+          "phase": "P1",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** broker/CPA/lender firm directories\n- **Do** crawl for named principals + contact channel (email vs form)\n- **Out** prospects with role + channel\n- **Test** every prospect row has `channel \u2208 {email, form, phone}` and a source URL\n"
+        },
+        {
+          "id": "T1.03",
+          "title": "Listing text \u2192 7-field spec",
+          "phase": "P1",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** raw dump or LeadSpec JSON\n- **Do** extract company, industry, revenue, EBITDA, geography, urgency, target size; stamp each\n- **Out** `state/specs/<slug>.json`\n- **Test** `spec_builder <dump> --write` exits 0; a dump missing EBITDA refuses with the exact field named\n"
+        },
+        {
+          "id": "T1.04",
+          "title": "Vertical normalization",
+          "phase": "P1",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** marketing headline\n- **Do** map to canonical vertical + NAICS sector + revenue floor (40 verticals)\n- **Out** `vertical`, `sector`, `floor_usd` on the spec\n- **Test** \"Turnkey 35-Year HVAC Company with Stellar Reputation\" \u2192 `HVAC`, not the headline\n"
+        },
+        {
+          "id": "T1.05",
+          "title": "ICP filter and reject reasons",
+          "phase": "P1",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** spec\n- **Do** apply vertical floor + size band + geography rule; reject outside ICP with a reason code\n- **Out** `state/rejects/*.jsonl` (slug, code, detail)\n- **Test** every reject has a code from a closed enum; no reject is silently dropped\n"
+        },
+        {
+          "id": "T1.06",
+          "title": "Blocked-field unblock ask",
+          "phase": "P1",
+          "status": "built",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** spec with missing money fields\n- **Do** generate a one-question letter naming exactly what's missing (\"EBITDA with owner add-backs\")\n- **Out** staged `.eml` per blocked target\n- **Test** 25 EBITDA-hidden listings produce 25 asks, each naming EBITDA and no other field\n"
+        },
+        {
+          "id": "T1.07",
+          "title": "QLA 10-factor score",
+          "phase": "P1",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** complete spec\n- **Do** score: cash flow, leverage, moat, seller motivation, transferability, upside, risk, financing fit, market, fit\n- **Out** score + factor breakdown + GO/NO-GO\n- **Test** a $1.2M home-health deal scores 10/10 with every factor printed; missing inputs lower the score, never raise it\n"
+        },
+        {
+          "id": "T1.08",
+          "title": "Cross-source dedupe",
+          "phase": "P1",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** specs from all sources\n- **Do** match on normalized name + geography + revenue band + phone; merge, keep first-seen provenance\n- **Out** one canonical deal per business\n- **Test** same business listed by two brokers yields one deal with two `sources[]`\n"
+        },
+        {
+          "id": "T1.09",
+          "title": "Target profile card  *(step 11)*",
+          "phase": "P1",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** spec + source dumps\n- **Do** assemble: what it does, who buys it, why it's for sale, what the owner wants, what's missing\n- **Out** `target_profile` artifact\n- **Test** card cites a source line for every factual claim; unsourced claims are absent, not softened\n"
+        },
+        {
+          "id": "T1.10",
+          "title": "Generality red-flag sweep  *(step 12)*",
+          "phase": "P1",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** target profile\n- **Do** check: market trajectory, customer concentration, licensing, litigation, environmental, key-person\n- **Out** `red_flags` artifact with severity\n- **Test** each flag maps to an evidence line or is labeled `unverified hypothesis`\n"
+        },
+        {
+          "id": "T1.11",
+          "title": "Lice-comb deep dive  *(step 13)*",
+          "phase": "P1",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** red flags\n- **Do** targeted public-records and registry checks; FOIA-style free sources only\n- **Out** `lice_comb` artifact\n- **Test** every finding carries a URL + retrieval date; zero findings is reported as \"checked, clean\", not omitted\n"
+        },
+        {
+          "id": "T1.12",
+          "title": "Local market intel pack",
+          "phase": "P1",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** vertical + geography\n- **Do** competitor set, pricing, seasonality, labor availability, licensing authority\n- **Out** market section of target profile\n- **Test** competitor list \u22655 named firms with a source each, or an explicit \"thin market\" statement\n"
+        },
+        {
+          "id": "T1.13",
+          "title": "Search letter  *(step 17)*",
+          "phase": "P1",
+          "status": "built",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** spec\n- **Do** render the buyer's inquiry letter: cash + seller financing, one business at a time, two questions\n- **Out** staged approach per broker prospect\n- **Test** rendered letter contains no invented numbers; revenue band comes from the spec\n"
+        },
+        {
+          "id": "T1.14",
+          "title": "Kiss-frogs sweeper  *(step 18)*",
+          "phase": "P1",
+          "status": "partial",
+          "channel": "email/form",
+          "human": "no",
+          "body": "- **In** replies marked `no`\n- **Do** re-ask the same intermediary for the next name; keep a referral chain per target\n- **Out** referral graph\n- **Test** a \"no\" reply produces a follow-up ask for a referral, never a repeat pitch\n"
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "BUILDING THE COURT",
+      "qla": "QLA 6 \u00b7 7 \u00b7 8 \u00b7 9 \u00b7 21 \u00b7 22",
+      "tasks": [
+        {
+          "id": "T2.01",
+          "title": "Chairman role spec  *(step 6)*",
+          "phase": "P2",
+          "status": "built",
+          "channel": "local",
+          "human": "yes (final choice)",
+          "body": "- **In** vertical + deal size\n- **Do** define the chairman profile: sector credibility, exit history, network, time, compensation shape\n- **Out** `role_spec` artifact + search parameters\n- **Test** walker emits step 06 and refuses to advance until confirmed\n"
+        },
+        {
+          "id": "T2.02",
+          "title": "Chairman candidate sourcing",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** role spec\n- **Do** build candidate list from public sources: retired operators, ex-division presidents, board members of comparables\n- **Out** ranked candidates with evidence of fit\n- **Test** \u226510 candidates, each with a public source proving the role they held\n"
+        },
+        {
+          "id": "T2.03",
+          "title": "Board roster design  *(step 7)*",
+          "phase": "P2",
+          "status": "partial",
+          "channel": "local",
+          "human": "yes (composition)",
+          "body": "- **In** chairman + gaps analysis\n- **Do** propose 3\u20135 seats with the gap each seat fills (finance, sector, legal, operations)\n- **Out** `board_roster` artifact\n- **Test** every seat names the specific gap it closes; no \"advisor\" seat without a deliverable\n"
+        },
+        {
+          "id": "T2.04",
+          "title": "Big Four / large CPA targeting  *(step 8)*",
+          "phase": "P2",
+          "status": "built",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** geography\n- **Do** find firms with acquisition accounting + QoE capability at this deal size\n- **Out** verified prospects, role `accountant`\n- **Test** every prospect MX-validated; approach letter asks capability + who runs it, not price\n"
+        },
+        {
+          "id": "T2.05",
+          "title": "Top-tier counsel targeting  *(step 9)*",
+          "phase": "P2",
+          "status": "built",
+          "channel": "email/form",
+          "human": "no",
+          "body": "- **In** geography + deal structure\n- **Do** find M&A counsel; map to email or form channel\n- **Out** verified prospects, role `counsel`\n- **Test** channel assigned per firm; form-only firms queued to the browser channel, not dropped\n"
+        },
+        {
+          "id": "T2.06",
+          "title": "Lender and banker targeting  *(steps 21 \u00b7 22)*",
+          "phase": "P2",
+          "status": "built",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** deal size + collateral profile\n- **Do** find SBA/commercial lenders and acquisition financiers with local appetite\n- **Out** verified prospects, role `lender`\n- **Test** letter asks appetite and PG requirement in one line; no lender is contacted without a deal spec\n"
+        },
+        {
+          "id": "T2.07",
+          "title": "Verification pass before any contact",
+          "phase": "P2",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** prospect\n- **Do** MX check, domain plausibility, one-per-domain selection, confidence score\n- **Out** `prospects.db` rows eligible for approach\n- **Test** 0% of staged approaches have a dead domain; no firm receives two letters from the same role\n"
+        },
+        {
+          "id": "T2.08",
+          "title": "Role-specific letter rendering",
+          "phase": "P2",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** prospect + spec + role\n- **Do** render letter with role\u2192QLA-step mapping: broker 17/18, accountant 8, counsel 9, lender 21/22, chairman 6, director 7\n- **Out** `.eml` with subject, body, greeting rules\n- **Test** generic inbox gets `Hello,`; a named contact gets `Hi <First>,`; no nav text is ever read as a person\n"
+        },
+        {
+          "id": "T2.09",
+          "title": "Cadence and stop rules",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** staged approach\n- **Do** follow-up ladder day 3 / day 7 / day 14; stop on any reply; max 3 touches per domain per quarter\n- **Out** scheduled touches\n- **Test** a reply at day 3 cancels days 7 and 14; quarter cap enforced in the ledger\n"
+        },
+        {
+          "id": "T2.10",
+          "title": "Retainer / engagement tracker",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes (signing)",
+          "body": "- **In** positive reply\n- **Do** track engagement stage per advisor: contacted \u2192 interested \u2192 terms \u2192 retained; hold the artifact each stage emits\n- **Out** court status board\n- **Test** court board shows which of the four seats are filled, at all times, with dates\n"
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "MOLES",
+      "qla": "QLA 10",
+      "tasks": [
+        {
+          "id": "T3.01",
+          "title": "Mole candidate identification",
+          "phase": "P3",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** target + vertical\n- **Do** list non-transactional insiders: loan officers, insurers, suppliers, competitors' ex-staff, licensing clerks\n- **Out** candidate list with the specific thing each could know\n- **Test** every candidate row states one question only they could answer\n"
+        },
+        {
+          "id": "T3.02",
+          "title": "Mole approach (non-transactional)",
+          "phase": "P3",
+          "status": "planned",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** candidate + question\n- **Do** send a short, no-ask-of-favor note that earns a reply; never mention acquisition\n- **Out** staged approach\n- **Test** letter contains no acquisition language and asks exactly one question\n"
+        },
+        {
+          "id": "T3.03",
+          "title": "Mole question bank",
+          "phase": "P3",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** vertical\n- **Do** maintain the 10 questions that reveal real market conditions (churn, pricing pressure, labor, seasonality)\n- **Out** question bank per vertical\n- **Test** each question is answerable by a non-owner insider; no question requires confidential data\n"
+        },
+        {
+          "id": "T3.04",
+          "title": "Answer intake and attribution",
+          "phase": "P3",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** mole reply\n- **Do** extract claims, attribute to source role + date, mark `unverified` until corroborated\n- **Out** intelligence entries linked to the target\n- **Test** a claim appearing in two independent mole replies flips to `corroborated`\n"
+        },
+        {
+          "id": "T3.05",
+          "title": "Reciprocity ledger",
+          "phase": "P3",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes (small favors)",
+          "body": "- **In** mole interactions\n- **Do** record what was given and owed; surface the moment reciprocity is due\n- **Out** reciprocity queue\n- **Test** no mole is asked a second favor with an open debt\n"
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "OUTREACH EXECUTION",
+      "qla": "",
+      "tasks": [
+        {
+          "id": "T4.01",
+          "title": "Email channel",
+          "phase": "P4",
+          "status": "partial",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** staged `.eml`\n- **Do** SMTP send with app password; record verdict `sent | failed | no_recipient` with the exact reason\n- **Out** ledger row + Message-ID\n- **Test** missing credentials \u2192 `failed` with the env var named, never `sent`\n"
+        },
+        {
+          "id": "T4.02",
+          "title": "Form channel",
+          "phase": "P4",
+          "status": "built",
+          "channel": "form",
+          "human": "no (fill), yes (first submit approval)",
+          "body": "- **In** firm contact page\n- **Do** render page in headless Chromium, map identity onto labels, fill, screenshot, submit, verify confirmation text\n- **Out** `form_submissions` row + proof screenshot\n- **Test** 9/10 fields filled on a live Gravity Form; `submitted` recorded only with confirmation text\n"
+        },
+        {
+          "id": "T4.03",
+          "title": "Marketplace message channel",
+          "phase": "P4",
+          "status": "planned",
+          "channel": "market",
+          "human": "no",
+          "body": "- **In** marketplace listing with a contact form\n- **Do** stealth-session form fill (headless is 403 at these hosts); one message per listing, referencing the ad id\n- **Out** submission record with screenshot\n- **Test** message delivered to a live listing inquiry form; headless fallback never attempted twice\n"
+        },
+        {
+          "id": "T4.04",
+          "title": "Template library by role",
+          "phase": "P4",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** role + spec\n- **Do** maintain letters for broker, accountant, counsel, lender, chairman, director, seller, mole\n- **Out** versioned templates with change history\n- **Test** every role renders without a missing-field exception on a complete spec\n"
+        },
+        {
+          "id": "T4.05",
+          "title": "Personalization without invention",
+          "phase": "P4",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** prospect + spec\n- **Do** use only fields that exist in the spec; vertical/geo/article agreement handled (an HVAC, not a HVAC)\n- **Out** rendered letter\n- **Test** grep the rendered corpus for numbers not present in any spec \u2192 zero hits\n"
+        },
+        {
+          "id": "T4.06",
+          "title": "Rate limits and reputation protection",
+          "phase": "P4",
+          "status": "planned",
+          "channel": "all",
+          "human": "no",
+          "body": "- **In** send queue\n- **Do** cap per domain (1/quarter), per provider (50/day), jitter intervals; pause on any bounce spike\n- **Out** throttle state\n- **Test** force 60 sends \u2192 50 go out, 10 deferred, no domain exceeds 1\n"
+        },
+        {
+          "id": "T4.07",
+          "title": "Bounce and complaint handling",
+          "phase": "P4",
+          "status": "planned",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** DSN / spam complaint\n- **Do** mark prospect dead, suppress domain, log cause; never retry a hard bounce\n- **Out** suppression list\n- **Test** hard bounce \u2192 domain suppressed across all roles in the same run\n"
+        },
+        {
+          "id": "T4.08",
+          "title": "Opt-out respect",
+          "phase": "P4",
+          "status": "planned",
+          "channel": "all",
+          "human": "no",
+          "body": "- **In** \"remove me\"\n- **Do** permanent suppression across deals and roles, honored before any future send\n- **Out** global do-not-contact list\n- **Test** an opt-out prospect cannot be staged by any role, any deal, ever\n"
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "INTAKE AND QUALIFICATION",
+      "qla": "",
+      "tasks": [
+        {
+          "id": "T5.01",
+          "title": "Inbox fetch and thread assembly",
+          "phase": "P5",
+          "status": "built",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** IMAP mailbox\n- **Do** pull new mail, assemble threads, ignore self-sent and auto-replies\n- **Out** reply records\n- **Test** an out-of-office reply produces no deal state change\n"
+        },
+        {
+          "id": "T5.02",
+          "title": "Intent classification",
+          "phase": "P5",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** reply text\n- **Do** classify: interested / question / not_interested / out_of_office / bounce / other\n- **Out** intent + confidence\n- **Test** fixtures for all six classes classify correctly; unclassifiable goes to `REVIEW`, never guessed\n"
+        },
+        {
+          "id": "T5.03",
+          "title": "Reply-to-deal matching",
+          "phase": "P5",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** reply\n- **Do** match on sender address, ad id in subject/body, geography + name\n- **Out** deal link or `unattributed`\n- **Test** unattributable mail never increments reply rate\n"
+        },
+        {
+          "id": "T5.04",
+          "title": "Walker advance on qualified reply",
+          "phase": "P5",
+          "status": "partial",
+          "channel": "local",
+          "human": "yes (step confirms)",
+          "body": "- **In** matched qualified reply\n- **Do** advance the walker to the next artifact, draft it, queue the confirm\n- **Out** next-step draft + task\n- **Test** an \"interested\" fixture advances exactly one step and creates exactly one human task\n"
+        },
+        {
+          "id": "T5.05",
+          "title": "NDA dispatch",
+          "phase": "P5",
+          "status": "planned",
+          "channel": "email",
+          "human": "yes (signature)",
+          "body": "- **In** qualified seller/broker\n- **Do** send NDA template, track signature state, re-ping after 3 days\n- **Out** NDA record + signed copy location\n- **Test** NDA status is never \"signed\" without a copy of the signed file\n"
+        },
+        {
+          "id": "T5.06",
+          "title": "Document request checklist",
+          "phase": "P5",
+          "status": "planned",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** NDA signed\n- **Do** request the canonical set: 3y P&L, tax returns, CIM, leases, contracts, org chart, add-back schedule\n- **Out** document tracker per deal\n- **Test** each requested doc has a status: requested / received / missing / refused\n"
+        },
+        {
+          "id": "T5.07",
+          "title": "Qualification scorecard",
+          "phase": "P5",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** documents received\n- **Do** score against the 10 factors with evidence links; recompute the GO/NO-GO\n- **Out** updated score with deltas from listing-stage score\n- **Test** a score can only rise with a new document, never with a re-read of the same one\n"
+        },
+        {
+          "id": "T5.08",
+          "title": "Human escalation with a brief",
+          "phase": "P5",
+          "status": "partial",
+          "channel": "human",
+          "human": "yes",
+          "body": "- **In** any step needing a body\n- **Do** create one task: who to call/meet, why, the 3 things to ask, duration, prepared evidence\n- **Out** `state/tasks/*.md` + calendar slot\n- **Test** every task has a reason string and an attached artifact; no task says \"follow up\"\n"
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "name": "DEAL EXECUTION",
+      "qla": "QLA 19\u201325",
+      "tasks": [
+        {
+          "id": "T6.01",
+          "title": "LOI draft  *(step 19)*",
+          "phase": "P6",
+          "status": "built",
+          "channel": "local",
+          "human": "yes (price and terms)",
+          "body": "- **In** qualified deal + score + docs\n- **Do** generate LOI: price, structure, escrow, exclusivity, diligence window, contingencies\n- **Out** LOI 2,200+ chars + PDF\n- **Test** LOI refuses to render if any money field is `assumed`\n"
+        },
+        {
+          "id": "T6.02",
+          "title": "1.5x coverage test  *(step 25)*",
+          "phase": "P6",
+          "status": "built",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** price + verified EBITDA/SDE\n- **Do** test debt service coverage \u22651.5x; refuse structures that fail\n- **Out** coverage artifact with the arithmetic shown\n- **Test** an SDE-as-EBITDA substitution changes the verdict and is flagged as `inferred`\n"
+        },
+        {
+          "id": "T6.03",
+          "title": "Seller note structuring  *(step 23)*",
+          "phase": "P6",
+          "status": "built",
+          "channel": "local",
+          "human": "yes (negotiation)",
+          "body": "- **In** price, coverage, seller motivation\n- **Do** propose note: amount, rate, term, standby, offset rights\n- **Out** seller-note term sheet\n- **Test** terms satisfy the 1.5x test at the proposed price, or the proposal states the gap\n"
+        },
+        {
+          "id": "T6.04",
+          "title": "Alternative structures  *(step 24)*",
+          "phase": "P6",
+          "status": "built",
+          "channel": "local",
+          "human": "yes",
+          "body": "- **In** failed or marginal coverage\n- **Do** generate alternatives: earn-out, consulting tail, asset-only, lease-back, deferred equity\n- **Out** ranked alternatives with trade-offs\n- **Test** every alternative carries its own coverage math\n"
+        },
+        {
+          "id": "T6.05",
+          "title": "Asset leverage plan  *(step 22)*",
+          "phase": "P6",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** balance sheet + collateral\n- **Do** identify assets the target already owns that can fund the deal (real estate, equipment, receivables, contracts)\n- **Out** leverage memo\n- **Test** every leveraged asset names its lender-eligible value and source\n"
+        },
+        {
+          "id": "T6.06",
+          "title": "Action plan  *(step 20)*",
+          "phase": "P6",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** LOI + diligence state\n- **Do** sequence every remaining action with owner, date, dependency\n- **Out** `action_plan` artifact\n- **Test** no action lacks an owner or a date; dependencies form a DAG (no cycles)\n"
+        },
+        {
+          "id": "T6.07",
+          "title": "Critical path  *(step 21)*",
+          "phase": "P6",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** action plan\n- **Do** compute the longest dependency chain; surface float\n- **Out** `critical_path` artifact + calendar\n- **Test** delaying any critical-path item moves the projected close date by the same amount\n"
+        },
+        {
+          "id": "T6.08",
+          "title": "Negotiation turf strategy  *(step 26)*",
+          "phase": "P6",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes",
+          "body": "- **In** counterparty profile\n- **Do** plan venue, sequencing, concessions ladder, walk-away\n- **Out** `turf_strategy` brief\n- **Test** brief states the walk-away number and the concession order before any meeting\n"
+        },
+        {
+          "id": "T6.09",
+          "title": "Contract review pack  *(steps 27\u201328)*",
+          "phase": "P6",
+          "status": "partial",
+          "channel": "local",
+          "human": "yes (counsel)",
+          "body": "- **In** draft APA/NDA/note\n- **Do** generate the package + an issues list for counsel: reps, indemnity, escrow, non-compete, assignment\n- **Out** counsel pack\n- **Test** every generated contract renders; issues list references clause numbers, not vibes\n"
+        },
+        {
+          "id": "T6.10",
+          "title": "Closing checklist  *(step 29\u201330)*",
+          "phase": "P6",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes (signing)",
+          "body": "- **In** executed documents\n- **Do** funds flow, lien releases, insurance, licenses, transfer consents, employee notices\n- **Out** closing binder index\n- **Test** no closing item is marked done without a document reference\n"
+        }
+      ]
+    },
+    {
+      "id": "P7",
+      "name": "CLOSING AND TRANSITION",
+      "qla": "QLA 31\u201332",
+      "tasks": [
+        {
+          "id": "T7.01",
+          "title": "Closing plan",
+          "phase": "P7",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes",
+          "body": "- **In** closing checklist\n- **Do** timeline, parties, wires, verification steps, same-day sequence\n- **Out** closing plan\n- **Test** every wire has a verified callback procedure recorded (fraud control)\n"
+        },
+        {
+          "id": "T7.02",
+          "title": "90-day transition plan",
+          "phase": "P7",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes",
+          "body": "- **In** seller capabilities, key staff\n- **Do** who stays, what transfers, what the seller must teach, in what order\n- **Out** transition plan with weekly milestones\n- **Test** every critical process has a named successor and a documented handover date\n"
+        },
+        {
+          "id": "T7.03",
+          "title": "Post-close integration",
+          "phase": "P7",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes",
+          "body": "- **In** transition plan\n- **Do** systems, payroll, reporting, first 13-week cash flow\n- **Out** integration tracker\n- **Test** 13-week cash flow exists and reconciles to opening balance\n"
+        },
+        {
+          "id": "T7.04",
+          "title": "Re-evaluate  *(step 32)*",
+          "phase": "P7",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes (judgment)",
+          "body": "- **In** closed deal\n- **Do** compare plan vs outcome on every scored factor; extract what to change in the next search\n- **Out** re-evaluation memo feeding the scoring weights\n- **Test** the memo changes at least one scoring weight or explicitly records \"no change justified\"\n"
+        }
+      ]
+    },
+    {
+      "id": "P8",
+      "name": "MEMORY AND LEARNING",
+      "qla": "",
+      "tasks": [
+        {
+          "id": "T8.01",
+          "title": "Outcome ledger",
+          "phase": "P8",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** every deal\n- **Do** store stage reached, reason for death, elapsed days, touches used\n- **Out** queryable outcome table\n- **Test** every dead deal has a reason code from a closed enum\n"
+        },
+        {
+          "id": "T8.02",
+          "title": "Win/loss pattern extraction",
+          "phase": "P8",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** outcome ledger\n- **Do** find factors correlated with progression; require n\u22658 before claiming a pattern\n- **Out** pattern report with sample sizes\n- **Test** no pattern is reported below the sample threshold\n"
+        },
+        {
+          "id": "T8.03",
+          "title": "Template A/B by reply rate",
+          "phase": "P8",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** sends + replies\n- **Do** measure per-template reply rate with attribution rules intact\n- **Out** template leaderboard\n- **Test** unattributed replies never enter the denominator\n"
+        },
+        {
+          "id": "T8.04",
+          "title": "Vertical playbooks",
+          "phase": "P8",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** completed diligence\n- **Do** accumulate per-vertical: typical add-backs, valuation multiples, red flags, lender appetite\n- **Out** playbook per vertical\n- **Test** each playbook claim cites \u22652 deals or is labeled hypothesis\n"
+        },
+        {
+          "id": "T8.05",
+          "title": "Knowledge ingestion",
+          "phase": "P8",
+          "status": "partial",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** new methodology documents, transcripts, filings\n- **Do** index into the corpus with a stable id and version\n- **Out** searchable index\n- **Test** a query on a newly ingested document returns it with its source path\n"
+        }
+      ]
+    },
+    {
+      "id": "P9",
+      "name": "HUMAN INTERFACE",
+      "qla": "",
+      "tasks": [
+        {
+          "id": "T9.01",
+          "title": "Needs-you queue",
+          "phase": "P9",
+          "status": "partial",
+          "channel": "human",
+          "human": "yes",
+          "body": "- **In** escalations\n- **Do** one queue, sorted by deal value \u00d7 urgency, each item with duration + brief\n- **Out** daily queue\n- **Test** zero items in the queue are things the bot could have done itself (audited weekly)\n"
+        },
+        {
+          "id": "T9.02",
+          "title": "Calendar scheduling",
+          "phase": "P9",
+          "status": "partial",
+          "channel": "local",
+          "human": "yes (attends)",
+          "body": "- **In** any step needing presence\n- **Do** generate `.ics`, upload to Drive, offer to push to a calendar when scope allows\n- **Out** calendar file + invite text\n- **Test** every human task has a proposed slot; no task exists without a date\n"
+        },
+        {
+          "id": "T9.03",
+          "title": "Call briefs for unavoidable calls",
+          "phase": "P9",
+          "status": "partial",
+          "channel": "human",
+          "human": "yes",
+          "body": "- **In** target + question\n- **Do** 5-line brief: who, why now, three questions, what a good answer sounds like, what to do with a bad one\n- **Out** brief attached to task\n- **Test** brief fits one screen and contains no field the bot could have filled itself\n"
+        },
+        {
+          "id": "T9.04",
+          "title": "Daily digest",
+          "phase": "P9",
+          "status": "partial",
+          "channel": "email",
+          "human": "no",
+          "body": "- **In** cycle results\n- **Do** what moved, what's blocked, what needs a body, what broke \u2014 with numbers\n- **Out** digest email + `state/reports/cycle-<date>.md`\n- **Test** digest totals equal ledger totals for the same period\n"
+        },
+        {
+          "id": "T9.05",
+          "title": "Approval surface",
+          "phase": "P9",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes",
+          "body": "- **In** pending sends/submissions\n- **Do** one screen listing exactly what will leave the building, with the artifact preview\n- **Out** approve / edit / kill per item\n- **Test** nothing external leaves without an approval event recorded, except channels the owner has pre-approved\n"
+        },
+        {
+          "id": "T9.06",
+          "title": "Provenance dashboard",
+          "phase": "P9",
+          "status": "planned",
+          "channel": "local",
+          "human": "no",
+          "body": "- **In** all deal records\n- **Do** show which fields are verified vs inferred vs assumed, per deal\n- **Out** dashboard view\n- **Test** any deal with an `assumed` money field is visibly flagged before the LOI stage\n"
+        }
+      ]
+    }
+  ]
+}
