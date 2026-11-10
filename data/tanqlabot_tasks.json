@@ -1,11 +1,11 @@
 {
   "generated_from": "TASKS.md",
   "totals": {
-    "tasks": 80,
+    "tasks": 82,
     "by_status": {
       "built": 25,
       "partial": 17,
-      "planned": 38
+      "planned": 40
     },
     "phases": 10
   },
@@ -325,6 +325,24 @@
           "channel": "email",
           "human": "no",
           "body": "- **In** staged approach\n- **Do** follow-up ladder day 3 / day 7 / day 14; stop on any reply; max 3 touches per domain per quarter\n- **Out** scheduled touches\n- **Test** a reply at day 3 cancels days 7 and 14; quarter cap enforced in the ledger\n"
+        },
+        {
+          "id": "T2.11",
+          "title": "Industry expert panel  *(days 31\u201360)*",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "email",
+          "human": "yes (judgment on who is credible)",
+          "body": "- **In** vertical + chairman in place\n- **Do** recruit 2\u20133 operators who have run companies in the vertical; the timeline puts them in the same 30-day window as counsel and the accountant, not later\n- **Out** expert roster with the specific question each one answers\n- **Test** every expert has run or sold a company in this vertical, with a public source\n"
+        },
+        {
+          "id": "T2.12",
+          "title": "Financial institutions warmed before the first offer  *(days 61\u201390)*",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "email",
+          "human": "yes (bank meetings)",
+          "body": "- **In** deal pipeline + court assembled\n- **Do** open lines with banks, insurers and PE so they are \"warmed up & ready 2 accept 1st deal\" inside 90 days \u2014 before an LOI exists, not after\n- **Out** warm list with contact, appetite stated, and the date each was approached\n- **Test** no LOI is drafted for a deal with zero warmed lenders; each lender shows an approach date\n"
         },
         {
           "id": "T2.10",

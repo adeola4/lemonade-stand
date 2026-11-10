@@ -69,8 +69,8 @@
     <!-- ═══════════════ SIMPLE VIEW ═══════════════ -->
     <section id="simple">
       <div class="mb-5">
-        <h1 class="text-2xl font-bold">Peña's seven steps</h1>
-        <p class="text-sm mt-1" style="color:#9ca3af">His own taxonomy, verbatim from the QLA Castle Seminar slides — not my summary. Each card carries the line and the slide number.</p>
+        <h1 class="text-2xl font-bold">The QLA buying sequence — 120 days</h1>
+        <p class="text-sm mt-1" style="color:#9ca3af">The order Peña actually ran it in, verbatim from the QLA Castle Seminar slides: the 120-day completion timeline (slide 1586) and the 11 Step Action Plan (slide 1862). Each card carries the line and the slide number. Where a step has no slide behind it, the card says so.</p>
       </div>
 
       <div class="panel p-4 mb-5">
@@ -83,7 +83,7 @@
       <div id="workstreams" class="space-y-3"></div>
 
       <p class="text-xs mt-5" style="color:#6b7280">
-        Every step above maps to tasks on the board — 80 tasks, none unaccounted for.
+        Every step above maps to tasks on the board — 82 tasks, none unaccounted for.
         Hit <span class="mono" style="color:#fbbf24">Advanced</span> for the machinery, the tests, and what's proven.
         The source trail (verbatim quotes, slide numbers, and what could <em>not</em> be traced) is in
         <span class="mono">SOURCE_MAP.md</span>.
@@ -94,8 +94,8 @@
     <section id="advanced">
       <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
         <div>
-          <h1 class="text-xl font-bold">Task board <span class="text-sm font-normal" style="color:#6b7280">— the machinery under the nine jobs</span></h1>
-          <p class="text-sm mt-1" style="color:#9ca3af">80 tasks · every one with an acceptance test · built = executed against real input</p>
+          <h1 class="text-xl font-bold">Task board <span class="text-sm font-normal" style="color:#6b7280">— the machinery under the twelve steps</span></h1>
+          <p class="text-sm mt-1" style="color:#9ca3af">82 tasks · every one with an acceptance test · built = executed against real input</p>
         </div>
         <a href="https://github.com/adeola4/TANQLABOT" target="_blank" rel="noopener" class="btn btn-ghost">↗ Private spec repo</a>
       </div>
@@ -175,6 +175,7 @@
         el.innerHTML = `
           <div class="flex flex-wrap items-center gap-2 mb-1">
             <span class="mono text-xs" style="color:#6b7280">${w.id}</span>
+            ${w.window ? `<span class="pill" style="background:#1e293b;color:#93c5fd;border:1px solid #1e40af">${w.window}</span>` : ''}
             <span class="text-base font-semibold flex-1">${w.name}</span>
             <span class="pill ${WSPILL[w.status] || 'p-notbuilt'}">${WSLABEL[w.status] || w.status}</span>
           </div>
