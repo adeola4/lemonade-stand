@@ -28,6 +28,8 @@
     .p-waiting { background: rgba(251,191,36,.14); color: #fbbf24; border: 1px solid rgba(251,191,36,.35); }
     .p-partial { background: rgba(96,165,250,.14); color: #60a5fa; border: 1px solid rgba(96,165,250,.35); }
     .p-notbuilt { background: rgba(156,163,175,.12); color: #9ca3af; border: 1px solid rgba(156,163,175,.3); }
+    .p-yours { background: rgba(167,139,250,.14); color: #a78bfa; border: 1px solid rgba(167,139,250,.35); }
+    .quote { border-left: 3px solid #4b5563; padding: 6px 10px; background: rgba(255,255,255,.02); border-radius: 0 6px 6px 0; }
     .p-built { background: rgba(74,222,128,.14); color: #4ade80; border: 1px solid rgba(74,222,128,.35); }
     .p-planned { background: rgba(156,163,175,.12); color: #9ca3af; border: 1px solid rgba(156,163,175,.3); }
     .ws { border: 1px solid #2b3444; border-radius: 10px; background: #161b26; }
@@ -67,8 +69,8 @@
     <!-- ═══════════════ SIMPLE VIEW ═══════════════ -->
     <section id="simple">
       <div class="mb-5">
-        <h1 class="text-2xl font-bold">The nine jobs</h1>
-        <p class="text-sm mt-1" style="color:#9ca3af">What the bot actually does all day. Everything else on this page is detail.</p>
+        <h1 class="text-2xl font-bold">Peña's seven steps</h1>
+        <p class="text-sm mt-1" style="color:#9ca3af">His own taxonomy, verbatim from the QLA Castle Seminar slides — not my summary. Each card carries the line and the slide number.</p>
       </div>
 
       <div class="panel p-4 mb-5">
@@ -81,8 +83,10 @@
       <div id="workstreams" class="space-y-3"></div>
 
       <p class="text-xs mt-5" style="color:#6b7280">
-        Every job above is a projection of the task board — 80 tasks, none unaccounted for. Hit
-        <span class="mono" style="color:#fbbf24">Advanced</span> to see the machinery, the tests, and what's proven.
+        Every step above maps to tasks on the board — 80 tasks, none unaccounted for.
+        Hit <span class="mono" style="color:#fbbf24">Advanced</span> for the machinery, the tests, and what's proven.
+        The source trail (verbatim quotes, slide numbers, and what could <em>not</em> be traced) is in
+        <span class="mono">SOURCE_MAP.md</span>.
       </p>
     </section>
 
@@ -129,8 +133,8 @@
     let TASKS = null, SIMPLE = null;
     let fPhase = 'ALL', fStatus = 'ALL';
 
-    const WSPILL = { live: 'p-live', waiting: 'p-waiting', partial: 'p-partial', notbuilt: 'p-notbuilt' };
-    const WSLABEL = { live: 'Works today', waiting: 'Waiting on you', partial: 'Half live', notbuilt: 'Not built' };
+    const WSPILL = { live: 'p-live', waiting: 'p-waiting', partial: 'p-partial', notbuilt: 'p-notbuilt', yours: 'p-yours' };
+    const WSLABEL = { live: 'Works today', waiting: 'Waiting on you', partial: 'Half live', notbuilt: 'Not built', yours: 'Yours' };
     const PILL = { built: 'p-built', partial: 'p-partial', planned: 'p-planned' };
 
     function toggleAdvanced() {
@@ -175,10 +179,15 @@
             <span class="pill ${WSPILL[w.status] || 'p-notbuilt'}">${WSLABEL[w.status] || w.status}</span>
           </div>
           <p class="text-sm" style="color:#e5e7eb">${w.one_line}</p>
-          <p class="text-xs mt-2" style="color:#9ca3af"><span style="color:#4ade80">You get:</span> ${w.you_get}</p>
+          <div class="quote mt-2">
+            <p class="text-xs italic" style="color:#e5e7eb">"${w.pena_says}"</p>
+            <p class="text-xs mono mt-1" style="color:#6b7280">— ${w.cite}</p>
+          </div>
+          <p class="text-xs mt-2" style="color:#9ca3af"><span style="color:#60a5fa">Bot:</span> ${w.bot_does}</p>
+          <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#4ade80">You get:</span> ${w.you_get}</p>
           ${blocker}
-          <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#60a5fa">Next:</span> ${w.next}</p>
-          <p class="text-xs mt-2 mono" style="color:#4b5563">covers ${w.tasks.length} task${w.tasks.length === 1 ? '' : 's'}: ${w.tasks.join(', ')}</p>`;
+          <p class="text-xs mt-1" style="color:#9ca3af"><span style="color:#fbbf24">Next:</span> ${w.next}</p>
+          <p class="text-xs mt-2 mono" style="color:#4b5563">covers ${w.tasks.length} task${w.tasks.length === 1 ? '' : 's'}${w.tasks.length ? ': ' + w.tasks.join(', ') : ' — none'}</p>`;
         wrap.appendChild(el);
       });
     }
