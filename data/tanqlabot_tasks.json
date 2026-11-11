@@ -1,11 +1,11 @@
 {
   "generated_from": "TASKS.md",
   "totals": {
-    "tasks": 83,
+    "tasks": 86,
     "by_status": {
       "built": 25,
       "partial": 17,
-      "planned": 41
+      "planned": 44
     },
     "phases": 10
   },
@@ -352,6 +352,33 @@
           "channel": "email",
           "human": "yes (bank meetings)",
           "body": "- **In** deal pipeline + court assembled\n- **Do** open lines with banks, insurers and PE so they are \"warmed up & ready 2 accept 1st deal\" inside 90 days \u2014 before an LOI exists, not after\n- **Out** warm list with contact, appetite stated, and the date each was approached\n- **Test** no LOI is drafted for a deal with zero warmed lenders; each lender shows an approach date\n"
+        },
+        {
+          "id": "T2.13",
+          "title": "Firm interview pack and scorecard",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes (the interview itself is a call)",
+          "body": "- **In** a firm that replied positively (T5.02 classified as interested)\n- **Do** send a fixed five-question pack before any meeting \u2014 comparable scope, fee basis, deal-size experience, who actually does the work, conflicts \u2014 then score the answers on the same axes for every firm\n- **Out** one scorecard per firm, side by side, with the answers quoted\n- **Test** two firms at the same size produce comparable rows; a missing answer shows as a blank, never as an assumed value\n"
+        },
+        {
+          "id": "T2.14",
+          "title": "Joint venture partner lane (non dream team)",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "email",
+          "human": "yes (term agreement)",
+          "body": "- **In** a vertical and a deal thesis\n- **Do** identify operators and owners who are adjacent, not competing \u2014 people who gain from your deal without being on your board \u2014 and approach them for co-investment, supply, or roll-up participation\n- **Out** a JV lane list separate from the board roster, with the specific gain stated per partner\n- **Test** no name appears in both the board roster and the JV lane; every JV entry states what that partner gets\n"
+        },
+        {
+          "id": "T2.15",
+          "title": "JV term sheet and reciprocity ledger",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "local",
+          "human": "yes (signature)",
+          "body": "- **In** a JV partner who engaged\n- **Do** draft the two-page term sheet \u2014 contribution, split, exit, first right \u2014 and log what each side has delivered so far\n- **Out** a term sheet draft per partner plus a ledger of promises kept\n- **Test** the term sheet refuses to render with an empty contribution field; the ledger shows a date per entry\n"
         },
         {
           "id": "T2.10",
