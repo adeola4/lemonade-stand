@@ -1,11 +1,11 @@
 {
   "generated_from": "TASKS.md",
   "totals": {
-    "tasks": 86,
+    "tasks": 87,
     "by_status": {
       "built": 25,
       "partial": 17,
-      "planned": 44
+      "planned": 45
     },
     "phases": 10
   },
@@ -352,6 +352,15 @@
           "channel": "email",
           "human": "yes (bank meetings)",
           "body": "- **In** deal pipeline + court assembled\n- **Do** open lines with banks, insurers and PE so they are \"warmed up & ready 2 accept 1st deal\" inside 90 days \u2014 before an LOI exists, not after\n- **Out** warm list with contact, appetite stated, and the date each was approached\n- **Test** no LOI is drafted for a deal with zero warmed lenders; each lender shows an approach date\n"
+        },
+        {
+          "id": "T2.16",
+          "title": "Insurance and private-equity lane",
+          "phase": "P2",
+          "status": "planned",
+          "channel": "email",
+          "human": "yes (mandate conversations)",
+          "body": "- **In** deal size and vertical\n- **Do** approach commercial insurers and PE firms that actually write at this size \u2014 the source names banks, insurance companies and PE together, and the board only covered banks and lenders\n- **Out** a warm list by institution type with stated appetite and the approach date\n- **Test** no institution appears in both the lender list and the PE list; each entry states what it lends against or what it buys\n"
         },
         {
           "id": "T2.13",

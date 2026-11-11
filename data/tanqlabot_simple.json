@@ -1,9 +1,9 @@
 {
-  "version": 8,
+  "version": 9,
   "source": {
-    "primary": "the operator's five front-end lanes — named by the user, not by Pena",
+    "primary": "the operator's six front-end lanes",
     "detail": "SOURCE_MAP.md",
-    "note": "Lanes 1-4 and 6 are the operator's words verbatim. Pena's 11 Step Action Plan (slide 1862) and the 120-day timeline (slide 1586) remain the source for what happens INSIDE each lane and are cited per card. No dates anywhere: each lane states cadence, output per run, and the one thing that caps the multiple. Lane 5 is missing from the user's list and is flagged rather than invented."
+    "note": "Six lanes, named by the operator in his own words: 1 deal investigation, 2 board/dream team recruitment, 3 firm interviews, 4 financial institutions, 5 business sellers, 6 joint venture partners (non dream team). Pena's slides (1862 the eleven steps, 1586 the ordering) supply what happens inside each lane and are cited per card. No dates: cadence, output per run, and the one thing that caps the multiple."
   },
   "statuses": {
     "live": "Works today against real data",
@@ -76,13 +76,11 @@
         "T2.03",
         "T2.04",
         "T2.05",
-        "T2.06",
         "T2.07",
         "T2.08",
         "T2.09",
         "T2.10",
         "T2.11",
-        "T2.12",
         "T3.01",
         "T3.02",
         "T3.03",
@@ -115,6 +113,25 @@
     },
     {
       "id": "4",
+      "cadence": "Every deal thesis",
+      "name": "Financial institutions",
+      "pena_says": "FINANCIAL INSTITUTIONS: BANKS, INSURANCE CO'S, PE, ETC, WARMED UP & READY 2 ACCEPT 1ST DEAL",
+      "cite": "slide 1586 — the day-90 gate, the only deadline the source attaches to money",
+      "one_line": "Banks, insurers and PE opened before the first LOI exists, so the offer is fundable when it is made.",
+      "bot_does": "Targets lenders, bankers, insurers and PE firms at deal size, verifies every address, and writes the ask that matters: what you lend against, what you require personally guaranteed.",
+      "output_per_run": "6 verified lender targets including the regional development company that lends at this size — 6/6 MX-checked. Insurance and PE were named by the source and uncovered; T2.16 now exists.",
+      "ceiling": "Appetite at your deal size. Answered with breadth: more institutions opened, not a faster application.",
+      "status": "waiting",
+      "blocker": "Same email gate (GMAIL_ADDRESS, GMAIL_APP_PASSWORD)",
+      "next": "Record stated appetite per institution so the LOI knows its funding before it knows its price.",
+      "tasks": [
+        "T2.06",
+        "T2.12",
+        "T2.16"
+      ]
+    },
+    {
+      "id": "5",
       "cadence": "Every cycle",
       "name": "Business sellers",
       "pena_says": "1. Identify the idea · 6. Investigate continues · \"You must kiss a lot of frogs! Period!\"",
@@ -155,21 +172,6 @@
         "T7.03",
         "T7.04"
       ]
-    },
-    {
-      "id": "5",
-      "cadence": "—",
-      "name": "Lane 5 — missing from your list",
-      "pena_says": "You numbered 1, 2, 3, 4, 6. There is no 5.",
-      "cite": "your message, verbatim — a gap, flagged rather than filled with a guess",
-      "one_line": "Not invented. Name the fifth front-end lane and it gets a card, a cadence and tasks like the others.",
-      "bot_does": "Nothing. Guessing a lane here and building it would waste the build and misrepresent the system.",
-      "output_per_run": "Nothing — by design.",
-      "ceiling": "One line from you.",
-      "status": "yours",
-      "blocker": "Named by number, not by purpose",
-      "next": "Two candidates I would not pick for you: brokers (already inside lane 4) or lenders (already inside lane 2 as the banker seat).",
-      "tasks": []
     },
     {
       "id": "6",
